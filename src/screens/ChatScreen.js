@@ -1,5 +1,6 @@
 import React, { useLayoutEffect } from "react";
 import {
+	FlatList,
 	KeyboardAvoidingView,
 	ScrollView,
 	StyleSheet,
@@ -10,6 +11,7 @@ import {
 } from "react-native";
 import { Icon } from "react-native-elements";
 import ChatScreenHeaderLeft from "../components/ChatScreenHeaderLeft";
+import ChatBox from "../components/ChatBox";
 
 export default function ChatScreen({ navigation }) {
 	useLayoutEffect(() => {
@@ -23,12 +25,11 @@ export default function ChatScreen({ navigation }) {
 
 	return (
 		<KeyboardAvoidingView style={styles.container}>
-			<ScrollView style={styles.chatContainer}>
-				<Text>chat</Text>
-				<Text>chat</Text>
-				<Text>chat</Text>
-				<Text>chat</Text>
-			</ScrollView>
+			<FlatList
+				data={[1, 2, 9, 0 , 90]}
+				renderItem={({item, index}) => <ChatBox data={item} isMe={item%2 === 0} key={index}/>}
+				inverted
+			/>
 			<View style={styles.messageInputContainer}>
 				<TextInput
 					style={styles.messageInput}
@@ -48,8 +49,10 @@ const styles = StyleSheet.create({
 		backgroundColor: "#fff",
 	},
 	chatContainer: {
+		backgroundColor: "red",
 		flex: 1,
-		flexDirection: "column-reverse",
+		// flexDirection: "column-reverse"
+		// alignItems: "flex-end"
 	},
 	messageInputContainer: {
 		// height: 50,

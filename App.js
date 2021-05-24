@@ -46,7 +46,7 @@ export default function App() {
 			let userToken;
 
 			try {
-				userToken = null;
+				userToken = "null";
 			} catch (e) {
 				// Restoring token failed
 			}
