@@ -16,20 +16,23 @@ export default function ChatScreenHeaderLeft({ navigation }) {
 					rounded
 					source={{ uri: "https://picsum.photos/200/300" }}
 				/>
+				<Text style={styles.chatWithName}>Harsh</Text>
 			</TouchableOpacity>
-			<Text style={styles.chatWithName}>Harsh</Text>
 		</View>
 	);
 }
 
 const styles = StyleSheet.create({
 	container: {
-		marginLeft: 16,
+		// marginLeft: 16,
 		flexDirection: "row",
 		alignItems: "center",
 	},
 	chatingWithAvatar: {
-		marginLeft: 20,
+		marginLeft: 10,
+		flexDirection: "row",
+		alignItems: "center",
+		justifyContent: "flex-start",
 	},
 
 	chatWithName: {

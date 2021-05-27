@@ -10,7 +10,7 @@ import {
 	TouchableOpacity,
 	View,
 } from "react-native";
-import { Icon } from "react-native-elements";
+import { Icon, Header } from "react-native-elements";
 import ChatScreenHeaderLeft from "../components/ChatScreenHeaderLeft";
 import ChatBox from "../components/ChatBox";
 
@@ -38,15 +38,6 @@ export default function ChatScreen({ navigation }) {
 
 	useEffect(() => {}, []);
 
-	useLayoutEffect(() => {
-		console.log("Chating screen");
-		navigation.setOptions({
-			headerTitle: null,
-			headerStyle: { backgroundColor: "#ECECEC" },
-			headerLeft: () => <ChatScreenHeaderLeft navigation={navigation} />,
-		});
-	}, []);
-
 	const handleSendMessage = async () => {
 		setChats([
 			{
@@ -62,37 +53,45 @@ export default function ChatScreen({ navigation }) {
 	};
 
 	return (
-		<KeyboardAvoidingView style={styles.container}>
-			<FlatList
-				style={styles.chatList}
-				data={chats}
-				renderItem={({ item }) => (
-					<ChatBox
-						data={item}
-						isMe={myUserId === item.sentByUserId}
-						key={item.id}
-					/>
-				)}
-				keyExtractor={(_) => _.id}
-				inverted
+		<>
+			<Header
+				containerStyle={{
+					backgroundColor: "#ECECEC",
+				}}
+				leftComponent={<ChatScreenHeaderLeft navigation={navigation} />}
 			/>
-			<View style={styles.messageInputContainer}>
-				<TextInput
-					multiline
-					style={styles.messageInput}
-					placeholder="Enter Text"
-					value={textMessageToBeSent}
-					onChangeText={setTextMessageToBeSent}
-					onSubmitEditing={handleSendMessage}
+			<KeyboardAvoidingView style={styles.container}>
+				<FlatList
+					style={styles.chatList}
+					data={chats}
+					renderItem={({ item }) => (
+						<ChatBox
+							data={item}
+							isMe={myUserId === item.sentByUserId}
+							key={item.id}
+						/>
+					)}
+					keyExtractor={(_) => _.id}
+					inverted
 				/>
-				<TouchableOpacity
-					onPress={handleSendMessage}
-					style={styles.sendIcon}
-				>
-					<Icon name="send-outline" type="ionicon" />
-				</TouchableOpacity>
-			</View>
-		</KeyboardAvoidingView>
+				<View style={styles.messageInputContainer}>
+					<TextInput
+						multiline
+						style={styles.messageInput}
+						placeholder="Enter Text"
+						value={textMessageToBeSent}
+						onChangeText={setTextMessageToBeSent}
+						onSubmitEditing={handleSendMessage}
+					/>
+					<TouchableOpacity
+						onPress={handleSendMessage}
+						style={styles.sendIcon}
+					>
+						<Icon name="send-outline" type="ionicon" />
+					</TouchableOpacity>
+				</View>
+			</KeyboardAvoidingView>
+		</>
 	);
 }
 
