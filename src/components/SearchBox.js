@@ -7,6 +7,7 @@ export default function SearchBox({ toggleShowSearchBox }) {
 		<Animated.View style={styles.container}>
 			<View style={styles.searchBoxContainer}>
 				<Icon
+					size={22}
 					onPress={() => toggleShowSearchBox(false)}
 					style={styles.backIcon}
 					name="arrow-back"

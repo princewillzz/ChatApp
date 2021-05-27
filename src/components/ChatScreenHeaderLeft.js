@@ -2,7 +2,11 @@ import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Avatar, Icon } from "react-native-elements";
 
-export default function ChatScreenHeaderLeft({ navigation }) {
+export default function ChatScreenHeaderLeft({
+	navigation,
+	handleOpenImageModal,
+	userImage,
+}) {
 	return (
 		<View style={styles.container}>
 			<TouchableOpacity
@@ -11,11 +15,11 @@ export default function ChatScreenHeaderLeft({ navigation }) {
 			>
 				<Icon name="arrow-back-outline" type="ionicon" />
 			</TouchableOpacity>
-			<TouchableOpacity style={styles.chatingWithAvatar}>
-				<Avatar
-					rounded
-					source={{ uri: "https://picsum.photos/200/300" }}
-				/>
+			<TouchableOpacity
+				style={styles.chatingWithAvatar}
+				onPress={handleOpenImageModal}
+			>
+				<Avatar rounded source={{ uri: userImage }} />
 				<Text style={styles.chatWithName}>Harsh</Text>
 			</TouchableOpacity>
 		</View>

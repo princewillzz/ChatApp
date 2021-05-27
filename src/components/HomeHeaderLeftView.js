@@ -1,18 +1,21 @@
-import React from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { Avatar } from "react-native-elements";
+import React, { useEffect, useState } from "react";
+import { Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Avatar, Image } from "react-native-elements";
+import ImageViewer from "react-native-image-zoom-viewer";
 
-export default function HomeHeaderLeftView() {
+export default function HomeHeaderLeftView({ handleOpenImageModal, image }) {
 	return (
-		<View style={styles.container}>
-			<TouchableOpacity>
-				<Avatar
-					rounded
-					source={{ uri: "https://picsum.photos/200/300" }}
-					avatarStyle={styles.avatarStyle}
-				/>
-			</TouchableOpacity>
-		</View>
+		<>
+			<View style={styles.container}>
+				<TouchableOpacity onPress={() => handleOpenImageModal(image)}>
+					<Avatar
+						rounded
+						source={{ uri: image }}
+						avatarStyle={styles.avatarStyle}
+					/>
+				</TouchableOpacity>
+			</View>
+		</>
 	);
 }
 

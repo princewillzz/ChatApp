@@ -1,7 +1,8 @@
 import { StatusBar } from "expo-status-bar";
-import React, { useLayoutEffect, useState } from "react";
+import React, { useCallback, useLayoutEffect, useState } from "react";
 import {
 	Animated,
+	FlatList,
 	ScrollView,
 	StyleSheet,
 	Text,
@@ -10,14 +11,63 @@ import {
 	View,
 } from "react-native";
 import { Image, Button, Header, Icon, Input } from "react-native-elements";
+import AuthContext from "../auth/auth";
 import HomeHeaderLeftView from "../components/HomeHeaderLeftView";
 import HomeHeaderRightView from "../components/HomeHeaderRightView";
+import ImageModal from "../components/ImageModal";
 import RecentChat from "../components/RecentChat";
 import SearchBox from "../components/SearchBox";
 
+const users = [
+	{
+		id: Math.floor(Math.random() * 10000).toString(),
+		image: `https://source.unsplash.com/random/300x200?sig=${Math.floor(
+			Math.random() * 100
+		)}`,
+		username: "Harsh",
+	},
+	{
+		id: Math.floor(Math.random() * 10000).toString(),
+		image: `https://source.unsplash.com/random/300x200?sig=${Math.floor(
+			Math.random() * 100
+		)}`,
+		username: "Utkarsh",
+	},
+	{
+		id: Math.floor(Math.random() * 10000).toString(),
+		image: `https://source.unsplash.com/random/300x200?sig=${Math.floor(
+			Math.random() * 100
+		)}`,
+		username: "Lal babu",
+	},
+	{
+		id: Math.floor(Math.random() * 10000).toString(),
+		image: `https://source.unsplash.com/random/300x200?sig=${Math.floor(
+			Math.random() * 100
+		)}`,
+		username: "Animesh",
+	},
+];
+
 export default function HomeScreen({ navigation }) {
+	const { currentUserInfo } = React.useContext(AuthContext);
+
 	const [showSearchBox, setShowSearchBox] = useState(false);
 
+	// Zoom on the profile picture of all your contact
+	const [imageToBeShownOnModal, setImageToBeShownOnModal] = useState(null);
+	const [showImageModal, setShowImageModal] = useState(false);
+
+	const handleCloseImageModal = useCallback(
+		() => setShowImageModal(false),
+		[]
+	);
+	const handleOpenImageModal = useCallback((image) => {
+		setShowImageModal(true);
+		setImageToBeShownOnModal(image);
+	}, []);
+
+	// Search box
 	const toggleShowSearchBox = (state) => {
 		if (showSearchBox !== state) {
 			setShowSearchBox(state);
@@ -30,7 +80,12 @@ export default function HomeScreen({ navigation }) {
 				containerStyle={{
 					backgroundColor: "dodgerblue",
 				}}
-				leftComponent={<HomeHeaderLeftView />}
+				leftComponent={
+					<HomeHeaderLeftView
+						image={currentUserInfo.image}
+						handleOpenImageModal={handleOpenImageModal}
+					/>
+				}
 				rightComponent={
 					<HomeHeaderRightView
 						toggleShowSearchBox={toggleShowSearchBox}
@@ -42,21 +97,32 @@ export default function HomeScreen({ navigation }) {
 				<SearchBox toggleShowSearchBox={toggleShowSearchBox} />
 			)}
 
-			<ScrollView
+			<View
 				style={styles.container}
 				onTouchStart={() => toggleShowSearchBox(false)}
 			>
-				<View style={styles.recentChats}>
-					<RecentChat navigation={navigation} />
-					<RecentChat navigation={navigation} />
-					<RecentChat navigation={navigation} />
-					<RecentChat navigation={navigation} />
-					<RecentChat navigation={navigation} />
-					<RecentChat navigation={navigation} />
-					<RecentChat navigation={navigation} />
-					<RecentChat navigation={navigation} />
-				</View>
-			</ScrollView>
+				{/* <View style={styles.recentChats}> */}
+				<FlatList
+					style={styles.recentChats}
+					data={users}
+					renderItem={({ item }) => (
+						<RecentChat
+							handleOpenImageModal={handleOpenImageModal}
+							navigation={navigation}
+							userInfo={item}
+							key={item.id}
+						/>
+					)}
+					keyExtractor={(_) => _.id}
+				/>
+			</View>
+
+			<ImageModal
+				images={{ uri: imageToBeShownOnModal }}
+				showImageModal={showImageModal}
+				handleOpenImageModal={handleOpenImageModal}
+				handleCloseImageModal={handleCloseImageModal}
+			/>
 		</>
 	);
 }

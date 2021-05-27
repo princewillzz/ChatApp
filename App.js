@@ -1,6 +1,6 @@
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
-import React from "react";
+import React, { useState } from "react";
 import AuthContext from "./src/auth/auth";
 import ChatScreen from "./src/screens/ChatScreen";
 import HomeScreen from "./src/screens/HomeScreen";
@@ -10,6 +10,11 @@ import SignInScreen from "./src/screens/SignInScreen";
 const Stack = createStackNavigator();
 
 export default function App() {
+	// const [currentUserInfo] = useState({
+	// 	username: "I am Master",
+	// 	image: "https://picsum.photos/200/300",
+	// });
+
 	const [state, dispatch] = React.useReducer(
 		(prevState, action) => {
 			switch (action.type) {
@@ -46,7 +51,7 @@ export default function App() {
 			let userToken;
 
 			try {
-				userToken = "null";
+				userToken = null;
 			} catch (e) {
 				// Restoring token failed
 			}
@@ -79,6 +84,11 @@ export default function App() {
 				// In the example, we'll use a dummy token
 
 				dispatch({ type: "SIGN_IN", token: "dummy-auth-token" });
+			},
+			currentUserInfo: {
+				id: "12",
+				username: "I am Master",
+				image: "https://picsum.photos/200/300",
 			},
 		}),
 		[]

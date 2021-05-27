@@ -3,23 +3,36 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 import { ListItem, Avatar } from "react-native-elements";
 
-export default function RecentChat({ navigation }) {
+export default React.memo(({ navigation, handleOpenImageModal, userInfo }) => {
+	console.log(Math.random());
+
 	return (
-		<ListItem bottomDivider onPress={() => navigation.push("Chat")}>
-			<TouchableOpacity>
+		<ListItem
+			bottomDivider
+			onPress={() =>
+				navigation.push("Chat", {
+					userInfo: userInfo,
+				})
+			}
+		>
+			<TouchableOpacity
+				onPress={() => handleOpenImageModal(userInfo.image)}
+			>
 				<Avatar
 					rounded
-					source={{ uri: "https://picsum.photos/200/300" }}
+					source={{
+						uri: userInfo?.image,
+					}}
 				/>
 			</TouchableOpacity>
 			<ListItem.Content>
-				<ListItem.Title>Harsh</ListItem.Title>
+				<ListItem.Title>{userInfo?.username}</ListItem.Title>
 				<ListItem.Subtitle>Some chat</ListItem.Subtitle>
 			</ListItem.Content>
 			<ListItem.Chevron size={32} />
 		</ListItem>
 	);
-}
+});
 
 const styles = StyleSheet.create({
 	container: {

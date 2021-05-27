@@ -1,4 +1,9 @@
-import React, { useEffect, useLayoutEffect, useState } from "react";
+import React, {
+	useCallback,
+	useEffect,
+	useLayoutEffect,
+	useState,
+} from "react";
 
 import {
 	FlatList,
@@ -15,9 +20,28 @@ import ChatScreenHeaderLeft from "../components/ChatScreenHeaderLeft";
 import ChatBox from "../components/ChatBox";
 
 import moment from "moment";
+import ImageModal from "../components/ImageModal";
+import AuthContext from "../auth/auth";
+import ChatScreenHeaderRight from "../components/ChatScreenHeaderRight";
 
-export default function ChatScreen({ navigation }) {
-	const myUserId = "12"; // to be removed later on
+export default function ChatScreen({ route, navigation }) {
+	// const meUserInfo?.id = "12"; // to be removed later on
+
+	const { currentUserInfo: meUserInfo } = React.useContext(AuthContext);
+
+	const { userInfo } = route.params;
+
+	// show image modal
+	const [showImageModal, setShowImageModal] = useState(false);
+	const handleOpenImageModal = useCallback(() => {
+		setShowImageModal(true);
+	}, []);
+	const handleCloseImageModal = useCallback(
+		() => setShowImageModal(false),
+		[]
+	);
+
+	// end of show image modal
 
 	const [chats, setChats] = useState([
 		{
@@ -44,7 +68,7 @@ export default function ChatScreen({ navigation }) {
 				id: Math.random().toString(),
 				textMessage: textMessageToBeSent,
 				time: moment().format("HH:mm"),
-				sentByUserId: myUserId,
+				sentByUserId: meUserInfo?.id,
 			},
 			...chats,
 		]);
@@ -58,7 +82,14 @@ export default function ChatScreen({ navigation }) {
 				containerStyle={{
 					backgroundColor: "#ECECEC",
 				}}
-				leftComponent={<ChatScreenHeaderLeft navigation={navigation} />}
+				leftComponent={
+					<ChatScreenHeaderLeft
+						userImage={userInfo?.image}
+						handleOpenImageModal={handleOpenImageModal}
+						navigation={navigation}
+					/>
+				}
+				rightComponent={<ChatScreenHeaderRight />}
 			/>
 			<KeyboardAvoidingView style={styles.container}>
 				<FlatList
@@ -67,7 +98,7 @@ export default function ChatScreen({ navigation }) {
 					renderItem={({ item }) => (
 						<ChatBox
 							data={item}
-							isMe={myUserId === item.sentByUserId}
+							isMe={meUserInfo?.id === item?.sentByUserId}
 							key={item.id}
 						/>
 					)}
@@ -91,6 +122,11 @@ export default function ChatScreen({ navigation }) {
 					</TouchableOpacity>
 				</View>
 			</KeyboardAvoidingView>
+			<ImageModal
+				handleCloseImageModal={handleCloseImageModal}
+				showImageModal={showImageModal}
+				images={{ uri: userInfo?.image }}
+			/>
 		</>
 	);
 }
