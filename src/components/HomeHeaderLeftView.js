@@ -18,7 +18,8 @@ export default function HomeHeaderLeftView() {
 
 const styles = StyleSheet.create({
 	container: {
-		marginLeft: 16,
+		// backgroundColor: "red",
+		marginLeft: 6,
 		flexDirection: "row",
 		alignItems: "center",
 	},

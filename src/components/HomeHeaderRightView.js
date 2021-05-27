@@ -8,18 +8,25 @@ import {
 } from "react-native";
 import { Icon } from "react-native-elements";
 
-export default function HomeHeaderRightView() {
+export default function HomeHeaderRightView({ toggleShowSearchBox }) {
 	return (
 		<View style={styles.container}>
 			<TouchableOpacity>
 				<Icon
+					onPress={() => toggleShowSearchBox(true)}
 					style={styles.searchIcon}
 					name="search-outline"
 					type="ionicon"
+					color="#fff"
 				/>
 			</TouchableOpacity>
 			<TouchableOpacity>
-				<Icon name="ellipsis-vertical-outline" type="ionicon" />
+				<Icon
+					style={styles.moreIcon}
+					name="ellipsis-vertical-outline"
+					type="ionicon"
+					color="#fff"
+				/>
 			</TouchableOpacity>
 		</View>
 	);
@@ -27,10 +34,12 @@ export default function HomeHeaderRightView() {
 
 const styles = StyleSheet.create({
 	container: {
-		marginRight: 10,
 		flexDirection: "row",
 	},
 	searchIcon: {
 		marginRight: 5,
+	},
+	moreIcon: {
+		marginLeft: 10,
 	},
 });

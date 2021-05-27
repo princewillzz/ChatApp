@@ -97,30 +97,6 @@ export default function App() {
 									title: "Login",
 									headerTitleAlign: "center",
 									headerStyle: { backgroundColor: "silver" },
-									transitionSpec: {
-										open: {
-											animation: "spring",
-											config: {
-												stiffness: 1000,
-												damping: 500,
-												mass: 3,
-												overshootClamping: true,
-												restDisplacementThreshold: 0.01,
-												restSpeedThreshold: 0.01,
-											},
-										},
-										close: {
-											animation: "spring",
-											config: {
-												stiffness: 1000,
-												damping: 500,
-												mass: 3,
-												overshootClamping: true,
-												restDisplacementThreshold: 0.01,
-												restSpeedThreshold: 0.01,
-											},
-										},
-									},
 								}}
 							/>
 							<Stack.Screen
@@ -130,30 +106,6 @@ export default function App() {
 									title: "Register",
 									headerTitleAlign: "center",
 									headerStyle: { backgroundColor: "silver" },
-									transitionSpec: {
-										open: {
-											animation: "spring",
-											config: {
-												stiffness: 1000,
-												damping: 500,
-												mass: 3,
-												overshootClamping: true,
-												restDisplacementThreshold: 0.01,
-												restSpeedThreshold: 0.01,
-											},
-										},
-										close: {
-											animation: "spring",
-											config: {
-												stiffness: 1000,
-												damping: 500,
-												mass: 3,
-												overshootClamping: true,
-												restDisplacementThreshold: 0.01,
-												restSpeedThreshold: 0.01,
-											},
-										},
-									},
 								}}
 							/>
 						</>
@@ -163,30 +115,7 @@ export default function App() {
 								name="Home"
 								component={HomeScreen}
 								options={{
-									transitionSpec: {
-										open: {
-											animation: "spring",
-											config: {
-												stiffness: 1000,
-												damping: 500,
-												mass: 3,
-												overshootClamping: true,
-												restDisplacementThreshold: 0.01,
-												restSpeedThreshold: 0.01,
-											},
-										},
-										close: {
-											animation: "spring",
-											config: {
-												stiffness: 1000,
-												damping: 500,
-												mass: 3,
-												overshootClamping: true,
-												restDisplacementThreshold: 0.01,
-												restSpeedThreshold: 0.01,
-											},
-										},
-									},
+									headerShown: false,
 								}}
 							/>
 							<Stack.Screen name="Chat" component={ChatScreen} />
