@@ -10,7 +10,16 @@ import {
 	TouchableHighlight,
 	View,
 } from "react-native";
-import { Image, Button, Header, Icon, Input } from "react-native-elements";
+import DropDownPicker from "react-native-dropdown-picker";
+import {
+	Image,
+	Button,
+	Header,
+	Icon,
+	Input,
+	ListItem,
+} from "react-native-elements";
+import { users } from "../api/users";
 import AuthContext from "../auth/auth";
 import HomeHeaderLeftView from "../components/HomeHeaderLeftView";
 import HomeHeaderRightView from "../components/HomeHeaderRightView";
@@ -18,41 +27,14 @@ import ImageModal from "../components/ImageModal";
 import RecentChat from "../components/RecentChat";
 import SearchBox from "../components/SearchBox";
 
-const users = [
-	{
-		id: Math.floor(Math.random() * 10000).toString(),
-		image: `https://source.unsplash.com/random/300x200?sig=${Math.floor(
-			Math.random() * 100
-		)}`,
-		username: "Harsh",
-	},
-	{
-		id: Math.floor(Math.random() * 10000).toString(),
-		image: `https://source.unsplash.com/random/300x200?sig=${Math.floor(
-			Math.random() * 100
-		)}`,
-		username: "Utkarsh",
-	},
-	{
-		id: Math.floor(Math.random() * 10000).toString(),
-		image: `https://source.unsplash.com/random/300x200?sig=${Math.floor(
-			Math.random() * 100
-		)}`,
-		username: "Lal babu",
-	},
-	{
-		id: Math.floor(Math.random() * 10000).toString(),
-		image: `https://source.unsplash.com/random/300x200?sig=${Math.floor(
-			Math.random() * 100
-		)}`,
-		username: "Animesh",
-	},
-];
-
 export default function HomeScreen({ navigation }) {
 	const { currentUserInfo } = React.useContext(AuthContext);
 
 	const [showSearchBox, setShowSearchBox] = useState(false);
+	const [searchResultUsers, setSearchResultUsers] = useState([]);
+
+	// seach text
+	const [seachChatText, setSearchChatText] = useState(null);
 
 	// Zoom on the profile picture of all your contact
 	const [imageToBeShownOnModal, setImageToBeShownOnModal] = useState(null);
@@ -71,14 +53,26 @@ export default function HomeScreen({ navigation }) {
 	const toggleShowSearchBox = (state) => {
 		if (showSearchBox !== state) {
 			setShowSearchBox(state);
+			if (!state) {
+				setSearchChatText(null);
+			}
 		}
+	};
+
+	// handle Search
+	const handleSearchOnChange = (value) => {
+		setSearchChatText(value);
+
+		setSearchResultUsers(
+			users.filter((user) => user.username.toLowerCase().includes(value))
+		);
 	};
 
 	return (
 		<>
 			<Header
 				containerStyle={{
-					backgroundColor: "dodgerblue",
+					backgroundColor: "#ECECEC",
 				}}
 				leftComponent={
 					<HomeHeaderLeftView
@@ -88,33 +82,80 @@ export default function HomeScreen({ navigation }) {
 				}
 				rightComponent={
 					<HomeHeaderRightView
+						showSearchBox={showSearchBox}
 						toggleShowSearchBox={toggleShowSearchBox}
 					/>
 				}
 			/>
 
 			{showSearchBox && (
-				<SearchBox toggleShowSearchBox={toggleShowSearchBox} />
+				<SearchBox
+					handleSearchOnChange={handleSearchOnChange}
+					seachChatText={seachChatText}
+					toggleShowSearchBox={toggleShowSearchBox}
+				/>
 			)}
 
 			<View
 				style={styles.container}
 				onTouchStart={() => toggleShowSearchBox(false)}
 			>
-				{/* <View style={styles.recentChats}> */}
-				<FlatList
-					style={styles.recentChats}
-					data={users}
-					renderItem={({ item }) => (
-						<RecentChat
-							handleOpenImageModal={handleOpenImageModal}
-							navigation={navigation}
-							userInfo={item}
-							key={item.id}
+				{!seachChatText ? (
+					<FlatList
+						style={styles.recentChats}
+						data={users}
+						renderItem={({ item }) => (
+							<RecentChat
+								handleOpenImageModal={handleOpenImageModal}
+								navigation={navigation}
+								userInfo={item}
+								key={item.id}
+							/>
+						)}
+						keyExtractor={(_) => _.id}
+					/>
+				) : (
+					<>
+						<FlatList
+							style={styles.recentChats}
+							data={searchResultUsers}
+							renderItem={({ item }) => (
+								<RecentChat
+									handleOpenImageModal={handleOpenImageModal}
+									navigation={navigation}
+									userInfo={item}
+									key={item.id}
+								/>
+							)}
+							keyExtractor={(_) => _.id}
 						/>
-					)}
-					keyExtractor={(_) => _.id}
-				/>
+						{searchResultUsers.length <= 0 && (
+							<ListItem
+								style={styles.nothingFoundSearch}
+								containerStyle={{
+									backgroundColor: "#ECECEC",
+								}}
+								bottomDivider
+							>
+								<ListItem.Content
+									style={{
+										alignItems: "center",
+										flexDirection: "row",
+									}}
+								>
+									<Icon
+										name="alert-circle-outline"
+										type="ionicon"
+										style={{ marginRight: 5 }}
+									/>
+									<ListItem.Title>
+										Nothing Found
+									</ListItem.Title>
+								</ListItem.Content>
+							</ListItem>
+						)}
+					</>
+				)}
 			</View>
 
 			<ImageModal
@@ -147,5 +188,9 @@ const styles = StyleSheet.create({
 		height: 40,
 		borderRadius: 10,
 		// backgroundColor: "silver",
+	},
+	nothingFoundSearch: {
+		position: "absolute",
+		width: "100%",
 	},
 });

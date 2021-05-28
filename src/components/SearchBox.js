@@ -1,10 +1,27 @@
-import React from "react";
+import React, { useRef, useEffect } from "react";
 import { Animated, StyleSheet, Text, TextInput, View } from "react-native";
-import { Icon } from "react-native-elements";
+import { Icon, SearchBar } from "react-native-elements";
 
-export default function SearchBox({ toggleShowSearchBox }) {
+export default function SearchBox({
+	toggleShowSearchBox,
+	seachChatText,
+	handleSearchOnChange,
+}) {
+	const fadeAnim = useRef(new Animated.Value(0)).current;
+	React.useEffect(() => {
+		Animated.timing(fadeAnim, {
+			toValue: 1,
+			duration: 500,
+			useNativeDriver: true,
+		}).start();
+	}, [fadeAnim]);
+
 	return (
-		<Animated.View style={styles.container}>
+		<Animated.View
+			style={{
+				opacity: fadeAnim, // Bind opacity to animated value
+			}}
+		>
 			<View style={styles.searchBoxContainer}>
 				<Icon
 					size={22}
@@ -14,23 +31,16 @@ export default function SearchBox({ toggleShowSearchBox }) {
 					type="ionicon"
 					color="black"
 				/>
-				<Icon
-					size={18}
-					style={styles.searchIcon}
-					name="search-outline"
-					type="ionicon"
-					color="black"
-				/>
-				<TextInput
-					multiline
-					style={{
-						color: "#999",
-						width: "100%",
-					}}
-					autoFocus={true}
+				<SearchBar
 					placeholder={"I'm looking for..."}
-					placeholderTextColor={"#999"}
+					onChangeText={handleSearchOnChange}
+					value={seachChatText}
+					lightTheme
+					round
+					autoFocus={true}
 					autoCorrect={false}
+					containerStyle={styles.searchBarComponentContainer}
+					style={styles.searchBarComponent}
 				/>
 			</View>
 		</Animated.View>
@@ -38,22 +48,20 @@ export default function SearchBox({ toggleShowSearchBox }) {
 }
 
 const styles = StyleSheet.create({
-	container: {
-		position: "absolute",
-		top: 30,
-		left: 10,
-		width: "95%",
-		backgroundColor: "#fff",
-	},
+	container: {},
 	searchBoxContainer: {
 		flexDirection: "row",
 		alignItems: "center",
-		height: 40,
 		marginHorizontal: 5,
+		backgroundColor: "#fff",
 	},
-	backIcon: {},
-	searchIcon: {
-		marginLeft: 5,
-		marginRight: 10,
+
+	searchBarComponentContainer: {
+		backgroundColor: "#fff",
+		flex: 1,
 	},
+	searchBarComponent: {
+		color: "black",
+	},
+	backIcon: { marginLeft: 15 },
 });

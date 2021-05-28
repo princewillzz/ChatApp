@@ -66,7 +66,7 @@ export default function ChatScreen({ route, navigation }) {
 		setChats([
 			{
 				id: Math.random().toString(),
-				textMessage: textMessageToBeSent,
+				textMessage: textMessageToBeSent.trim(),
 				time: moment().format("HH:mm"),
 				sentByUserId: meUserInfo?.id,
 			},
@@ -112,7 +112,7 @@ export default function ChatScreen({ route, navigation }) {
 						placeholder="Enter Text"
 						value={textMessageToBeSent}
 						onChangeText={setTextMessageToBeSent}
-						onSubmitEditing={handleSendMessage}
+						// onSubmitEditing={handleSendMessage}
 					/>
 					<TouchableOpacity
 						onPress={handleSendMessage}

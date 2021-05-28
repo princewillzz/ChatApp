@@ -4,8 +4,6 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { ListItem, Avatar } from "react-native-elements";
 
 export default React.memo(({ navigation, handleOpenImageModal, userInfo }) => {
-	console.log(Math.random());
-
 	return (
 		<ListItem
 			bottomDivider

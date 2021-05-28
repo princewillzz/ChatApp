@@ -51,7 +51,7 @@ export default function App() {
 			let userToken;
 
 			try {
-				userToken = null;
+				userToken = "null";
 			} catch (e) {
 				// Restoring token failed
 			}
@@ -106,7 +106,9 @@ export default function App() {
 								options={{
 									title: "Login",
 									headerTitleAlign: "center",
-									headerStyle: { backgroundColor: "silver" },
+									headerStyle: {
+										backgroundColor: "dodgerblue",
+									},
 								}}
 							/>
 							<Stack.Screen
@@ -115,7 +117,9 @@ export default function App() {
 								options={{
 									title: "Register",
 									headerTitleAlign: "center",
-									headerStyle: { backgroundColor: "silver" },
+									headerStyle: {
+										backgroundColor: "dodgerblue",
+									},
 								}}
 							/>
 						</>

@@ -14,6 +14,7 @@ export default function HomeHeaderLeftView({ handleOpenImageModal, image }) {
 						avatarStyle={styles.avatarStyle}
 					/>
 				</TouchableOpacity>
+				<Text style={styles.title}>Chats</Text>
 			</View>
 		</>
 	);
@@ -21,6 +22,7 @@ export default function HomeHeaderLeftView({ handleOpenImageModal, image }) {
 
 const styles = StyleSheet.create({
 	container: {
+		width: "100%",
 		// backgroundColor: "red",
 		marginLeft: 6,
 		flexDirection: "row",
@@ -28,10 +30,10 @@ const styles = StyleSheet.create({
 	},
 	avatarStyle: {},
 	title: {
-		marginLeft: 5,
+		marginLeft: 10,
 		paddingLeft: 5,
-		fontSize: 16,
+		fontSize: 22,
 		fontWeight: "600",
-		textTransform: "uppercase",
+		// textTransform: "uppercase",
 	},
 });

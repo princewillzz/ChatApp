@@ -12,7 +12,7 @@ export default function ChatBox({ isMe, data }) {
 
 const styles = StyleSheet.create({
 	receivedBox: {
-		maxWidth: "40%",
+		maxWidth: "70%",
 		backgroundColor: "dodgerblue",
 		marginVertical: 7,
 		flex: 1,
@@ -23,7 +23,7 @@ const styles = StyleSheet.create({
 		// flexDirection: "row-reverse"
 	},
 	sentBox: {
-		maxWidth: "40%",
+		maxWidth: "70%",
 		backgroundColor: "pink",
 		marginVertical: 7,
 		flex: 1,
