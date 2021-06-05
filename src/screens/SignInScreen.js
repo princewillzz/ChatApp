@@ -1,25 +1,54 @@
 import { StatusBar } from "expo-status-bar";
-import React, { useLayoutEffect } from "react";
+import React from "react";
+import { ActivityIndicator } from "react-native";
 import { KeyboardAvoidingView, StyleSheet, View } from "react-native";
-import {
-	Image,
-	Text,
-	Button,
-	Header,
-	Icon,
-	Input,
-} from "react-native-elements";
+import { Button, Icon, Input } from "react-native-elements";
+import Toast from "react-native-toast-message";
 import AuthContext from "../auth/auth";
 
 export default function SignInScreen({ navigation }) {
 	const [username, setUsername] = React.useState("");
 	const [password, setPassword] = React.useState("");
 
+	const [isLoading, setLoading] = React.useState(true);
+
+	React.useEffect(() => {
+		setLoading(false);
+	}, []);
+
 	const { signIn } = React.useContext(AuthContext);
 
-	// useLayoutEffect(() => {
-	//     navigation.op
-	// }, [])
+	const usernameInput = React.createRef();
+	const passwordInput = React.createRef();
+
+	const handleSignIn = async () => {
+		if (!username) {
+			usernameInput.current.shake();
+			return;
+		}
+		if (!password) {
+			passwordInput.current.shake();
+			return;
+		}
+
+		setLoading(true);
+		signIn({ username, password })
+			.catch((e) => {
+				console.log("Catching error", e);
+				Toast.show({
+					type: "error",
+					position: "top",
+					text1: "Invalid credentials ",
+					visibilityTime: 1200,
+					autoHide: true,
+				});
+			})
+			.finally(() =>
+				setTimeout(() => {
+					setLoading(false);
+				}, 500)
+			);
+	};
 
 	return (
 		<>
@@ -32,6 +61,11 @@ export default function SignInScreen({ navigation }) {
 				}}
 			/> */}
 
+			{isLoading && (
+				<View style={[styles.loadingContainer]}>
+					<ActivityIndicator size="large" color="#3178D2" />
+				</View>
+			)}
 			<View style={styles.container}>
 				<KeyboardAvoidingView style={styles.formContainer}>
 					<Input
@@ -42,10 +76,18 @@ export default function SignInScreen({ navigation }) {
 							alignContent: "center",
 							width: "70%",
 						}}
-						leftIcon={<Icon name="email" size={20} color="black" />}
+						leftIcon={
+							<Icon
+								name="person-circle-outline"
+								size={22}
+								color="black"
+								type="ionicon"
+							/>
+						}
+						ref={usernameInput}
 					/>
 					<Input
-						placeholder="username"
+						placeholder="password"
 						value={password}
 						onChangeText={setPassword}
 						secureTextEntry
@@ -54,12 +96,13 @@ export default function SignInScreen({ navigation }) {
 							width: "70%",
 						}}
 						leftIcon={<Icon name="lock" size={20} color="black" />}
+						ref={passwordInput}
 					/>
 
 					<Button
 						title="Sign in"
 						raised
-						onPress={() => signIn({ username, password })}
+						onPress={handleSignIn}
 						buttonStyle={{
 							backgroundColor: "dodgerblue",
 						}}
@@ -77,6 +120,10 @@ export default function SignInScreen({ navigation }) {
 						}}
 						containerStyle={{
 							marginVertical: 10,
+						}}
+						buttonStyle={{
+							borderWidth: 0.9,
+							borderColor: "dodgerblue",
 						}}
 						type="outline"
 					/>
@@ -103,5 +150,17 @@ const styles = StyleSheet.create({
 		flex: 1,
 		justifyContent: "center",
 		alignItems: "center",
+	},
+	loadingContainer: {
+		position: "absolute",
+		top: 0,
+		left: 0,
+		zIndex: 10,
+		backgroundColor: "#ffffff",
+		opacity: 0.4,
+		justifyContent: "center",
+		alignItems: "center",
+		width: "100%",
+		height: "100%",
 	},
 });

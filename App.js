@@ -1,6 +1,10 @@
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import React, { useState } from "react";
+
+import Toast from "react-native-toast-message";
+import { signinUser } from "./src/api/auth-api";
+import { registerUser } from "./src/api/users-api";
 import AuthContext from "./src/auth/auth";
 import ChatScreen from "./src/screens/ChatScreen";
 import HomeScreen from "./src/screens/HomeScreen";
@@ -14,6 +18,8 @@ export default function App() {
 	// 	username: "I am Master",
 	// 	image: "https://picsum.photos/200/300",
 	// });
+
+	const handleStoreCurrentUserToken = async () => {};
 
 	const [state, dispatch] = React.useReducer(
 		(prevState, action) => {
@@ -51,7 +57,7 @@ export default function App() {
 			let userToken;
 
 			try {
-				userToken = "null";
+				userToken = null;
 			} catch (e) {
 				// Restoring token failed
 			}
@@ -68,22 +74,18 @@ export default function App() {
 
 	const authContext = React.useMemo(
 		() => ({
-			signIn: async (data) => {
-				// In a production app, we need to send some data (usually username, password) to server and get a token
-				// We will also need to handle errors if sign in failed
-				// After getting token, we need to persist the token using `SecureStore`
-				// In the example, we'll use a dummy token
-
-				dispatch({ type: "SIGN_IN", token: "dummy-auth-token" });
+			signIn: async (siginInfo) => {
+				return signinUser(siginInfo).then((responseData) => {
+					console.log(responseData);
+					// dispatch({ type: "SIGN_IN", token: responseData.id_token });
+				});
 			},
 			signOut: () => dispatch({ type: "SIGN_OUT" }),
-			signUp: async (data) => {
-				// In a production app, we need to send user data to server and get a token
-				// We will also need to handle errors if sign up failed
-				// After getting token, we need to persist the token using `SecureStore`
-				// In the example, we'll use a dummy token
-
-				dispatch({ type: "SIGN_IN", token: "dummy-auth-token" });
+			signUp: async (userInfo) => {
+				return registerUser(userInfo).then((responseDate) => {
+					console.log(responseDate);
+					// dispatch({ type: "SIGN_IN", token: responseDate.id_token });
+				});
 			},
 			currentUserInfo: {
 				id: "12",
@@ -142,6 +144,7 @@ export default function App() {
 						</>
 					)}
 				</Stack.Navigator>
+				<Toast ref={(ref) => Toast.setRef(ref)} />
 			</NavigationContainer>
 		</AuthContext.Provider>
 	);
