@@ -29,6 +29,18 @@ export const fetchAllUsers = () =>
       .catch(error => reject(error));
   });
 
+export const deleteUserByToken = tokenId =>
+  new Promise((resolve, reject) => {
+    Realm.open(UserdatabaseOptions)
+      .then(realm => {
+        realm.write(() => {
+          realm.delete(realm.objectForPrimaryKey(USERS_SCHEMA, tokenId));
+          resolve();
+        });
+      })
+      .catch(error => reject(error));
+  });
+
 export const deleteAllUsers = () =>
   new Promise((resolve, reject) => {
     Realm.open(UserdatabaseOptions)

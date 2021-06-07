@@ -5,6 +5,7 @@ import {Icon} from 'react-native-elements';
 export default function HomeHeaderRightView({
   toggleShowSearchBox,
   showSearchBox,
+  navigation,
 }) {
   return (
     <View style={styles.container}>
@@ -16,7 +17,7 @@ export default function HomeHeaderRightView({
           type="ionicon"
         />
       </TouchableOpacity>
-      <TouchableOpacity>
+      <TouchableOpacity onPress={() => navigation.openDrawer()}>
         <Icon
           style={styles.moreIcon}
           name="ellipsis-vertical-outline"

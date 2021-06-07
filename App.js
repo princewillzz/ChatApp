@@ -12,15 +12,17 @@ import SignInScreen from './src/screens/SignInScreen';
 
 import {UsersSchema, USERS_SCHEMA} from './src/db/allSchemas';
 
-const Stack = createStackNavigator();
-
 import {
   deleteAllUsers,
+  deleteUserByToken,
   fetchAllUsers,
   getActiveUser,
   insertUserSignedIn,
 } from './src/db/UsersDB';
 import jwtDecode from 'jwt-decode';
+import HomeScreenDrawerNavigation from './src/screens/HomeScreenDrawerNavigation';
+
+const Stack = createStackNavigator();
 
 export default function App() {
   const [currentUserInfo, setCurrentUserInfo] = React.useState('');
@@ -122,7 +124,11 @@ export default function App() {
             .catch(e => console.log(e));
         });
       },
-      signOut: () => dispatch({type: 'SIGN_OUT'}),
+      signOut: () => {
+        deleteUserByToken(currentUserInfo.token_id)
+          .then(() => dispatch({type: 'SIGN_OUT'}))
+          .catch(e => console.log(e));
+      },
       signUp: async userInfo => {
         return registerUser(userInfo).then(responseData => {
           insertUserSignedIn({
@@ -177,7 +183,7 @@ export default function App() {
             <>
               <Stack.Screen
                 name="Home"
-                component={HomeScreen}
+                component={HomeScreenDrawerNavigation}
                 options={{
                   headerShown: false,
                 }}

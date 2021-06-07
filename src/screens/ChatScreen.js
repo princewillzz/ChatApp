@@ -46,7 +46,7 @@ export default function ChatScreen({route, navigation}) {
     },
   ]);
 
-  const [textMessageToBeSent, setTextMessageToBeSent] = useState(null);
+  const [textMessageToBeSent, setTextMessageToBeSent] = useState('');
 
   useEffect(() => {}, []);
 
@@ -138,12 +138,22 @@ const styles = StyleSheet.create({
     marginRight: 10,
     paddingVertical: 10,
     paddingHorizontal: 25,
-    height: 50,
-    bottom: 0,
+    maxHeight: 100,
+    bottom: 6,
     borderRadius: 30,
     borderWidth: 1,
     borderColor: 'transparent',
     backgroundColor: '#ECECEC',
     color: 'black',
+  },
+  sendIcon: {
+    // backgroundColor: 'yellow',
+    // flex: 1,
+    alignSelf: 'flex-end',
+    bottom: 18,
+    // position: 'relative',
+    // position: 'absolute',
+    // bottom: 0,
+    // right: 0,
   },
 });

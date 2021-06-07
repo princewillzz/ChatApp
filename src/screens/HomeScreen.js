@@ -15,7 +15,6 @@ import SearchBox from '../components/SearchBox';
 
 export default function HomeScreen({navigation}) {
   const {currentUserInfo} = React.useContext(AuthContext);
-  console.log('User state in Home: ', currentUserInfo);
 
   const [showSearchBox, setShowSearchBox] = useState(false);
   const [searchResultUsers, setSearchResultUsers] = useState([]);
@@ -54,10 +53,6 @@ export default function HomeScreen({navigation}) {
 
   return (
     <>
-      {/* <Drawer.Navigator initialRouteName="Home"> */}
-      {/* <Drawer.Screen name="Home" component={HomeScreen} />
-        <Drawer.Screen name="Notifications" component={NotificationsScreen} />
-      */}
       <Header
         containerStyle={{
           backgroundColor: '#ECECEC',
@@ -70,6 +65,7 @@ export default function HomeScreen({navigation}) {
         }
         rightComponent={
           <HomeHeaderRightView
+            navigation={navigation}
             showSearchBox={showSearchBox}
             toggleShowSearchBox={toggleShowSearchBox}
           />
@@ -140,8 +136,6 @@ export default function HomeScreen({navigation}) {
           </>
         )}
       </View>
-
-      {/* </Drawer.Navigator> */}
 
       <ImageModal
         images={{uri: imageToBeShownOnModal}}
