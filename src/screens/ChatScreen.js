@@ -15,6 +15,14 @@ import ChatScreenHeaderLeft from '../components/ChatScreenHeaderLeft';
 import ChatScreenHeaderRight from '../components/ChatScreenHeaderRight';
 import ImageModal from '../components/ImageModal';
 
+import Realm from 'realm';
+import {ChatsSchema, CHATS_SCHEMA} from '../db/allSchemas';
+import {
+  chatSchemaRealmObject,
+  deleteAllChats,
+  insertChats,
+} from '../db/chatsSchema';
+
 export default function ChatScreen({route, navigation}) {
   // const meUserInfo?.id = "12"; // to be removed later on
 
@@ -48,7 +56,42 @@ export default function ChatScreen({route, navigation}) {
 
   const [textMessageToBeSent, setTextMessageToBeSent] = useState('');
 
-  useEffect(() => {}, []);
+  useEffect(() => {
+    // deleteAllChats();
+    console.log('useeffect');
+    // realm = new Realm({schema: [ChatsSchema]});
+
+    // add a listener to chatschema
+    chatSchemaRealmObject.addListener('change', () => {
+      console.log('listened changes');
+    });
+
+    // let index = 0;
+    // const have = setInterval(() => {
+    //   insertChats({
+    //     uid: 'string' + (Math.random() * 1000).toString(),
+    //     type: 'string',
+    //     text: 'string?',
+    //     link: 'string?',
+    //     timestamp: new Date(),
+    //     // Is me
+    //     isMe: false,
+    //     // sent info
+    //     send_to_id: 'string',
+    //   })
+    //     .then(() => {
+    //       console.log('chats');
+    //     })
+    //     .catch(e => {
+    //       console.log('error' + e);
+    //     });
+
+    //   index++;
+    //   if (index === 5) {
+    //     clearInterval(have);
+    //   }
+    // }, 1000);
+  }, []);
 
   const handleSendMessage = async () => {
     setChats([
@@ -57,6 +100,7 @@ export default function ChatScreen({route, navigation}) {
         textMessage: textMessageToBeSent.trim(),
         time: moment().format('HH:mm'),
         sentByUserId: meUserInfo?.user_id,
+        isMe: true,
       },
       ...chats,
     ]);
@@ -84,7 +128,7 @@ export default function ChatScreen({route, navigation}) {
           style={styles.chatList}
           data={chats}
           renderItem={({item}) => (
-            <ChatBox data={item} isMe={meUserInfo?.isMe} key={item.id} />
+            <ChatBox data={item} isMe={item.isMe} key={item.id} />
           )}
           keyExtractor={_ => _.id}
           inverted

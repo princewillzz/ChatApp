@@ -34,7 +34,7 @@ export const ChatsSchema = {
     link: 'string?',
     timestamp: 'date',
     // Is me
-    isMe: 'boolean?',
+    isMe: 'bool?',
     // sent info
     send_to_id: 'string',
   },
