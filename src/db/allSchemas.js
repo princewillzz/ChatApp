@@ -1,4 +1,6 @@
 export const USERS_SCHEMA = 'users';
+export const RECENT_CHAT_USERS_SCHEMA = 'recent_chat_users';
+export const CHATS_SCHEMA = 'chats_schema';
 
 export const UsersSchema = {
   name: USERS_SCHEMA,
@@ -7,5 +9,33 @@ export const UsersSchema = {
     token_id: 'string',
     loggedAt: 'string',
     status: 'string',
+  },
+};
+
+export const RecentChatUsersSchema = {
+  name: RECENT_CHAT_USERS_SCHEMA,
+  primaryKey: 'user_id',
+  properties: {
+    user_id: 'string',
+    username: 'string',
+    user_image: 'string?',
+    unseen_msg_count: 'int?',
+    last_unseen_msg: 'string?',
+  },
+};
+
+export const ChatsSchema = {
+  name: CHATS_SCHEMA,
+  primaryKey: 'uid',
+  properties: {
+    uid: 'string',
+    type: 'string',
+    text: 'string?',
+    link: 'string?',
+    timestamp: 'date',
+    // Is me
+    isMe: 'boolean?',
+    // sent info
+    send_to_id: 'string',
   },
 };

@@ -1,6 +1,7 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import {FlatList, StyleSheet, View} from 'react-native';
-import {Header, Icon, ListItem} from 'react-native-elements';
+import {FAB, Header, Icon, ListItem, Text} from 'react-native-elements';
+import {TouchableOpacity} from 'react-native-gesture-handler';
 import {users} from '../api/users';
 import AuthContext from '../auth/auth';
 import HomeHeaderLeftView from '../components/HomeHeaderLeftView';
@@ -8,6 +9,7 @@ import HomeHeaderRightView from '../components/HomeHeaderRightView';
 import ImageModal from '../components/ImageModal';
 import RecentChat from '../components/RecentChat';
 import SearchBox from '../components/SearchBox';
+import {fetchAllRecentChatUsers} from '../db/recent_chat_users';
 
 // import {createDrawerNavigator} from '@react-navigation/drawer';
 
@@ -15,6 +17,8 @@ import SearchBox from '../components/SearchBox';
 
 export default function HomeScreen({navigation}) {
   const {currentUserInfo} = React.useContext(AuthContext);
+
+  const [recentChatUsers, setRecentChatUsers] = useState([]);
 
   const [showSearchBox, setShowSearchBox] = useState(false);
   const [searchResultUsers, setSearchResultUsers] = useState([]);
@@ -51,6 +55,18 @@ export default function HomeScreen({navigation}) {
     );
   };
 
+  useEffect(() => {
+    fetchAllRecentChatUsers()
+      .then(recentChatUsers => {
+        console.log(recentChatUsers);
+        // setRecentChatUsers(recentChatUsers);
+        setRecentChatUsers(users);
+      })
+      .catch(e => {
+        console.log(e);
+      });
+  }, []);
+
   return (
     <>
       <Header
@@ -80,22 +96,30 @@ export default function HomeScreen({navigation}) {
         />
       )}
 
+      {recentChatUsers?.length <= 0 && (
+        <View>
+          <View style={styles.NoRecetChatsContainer}>
+            <Text style={styles.NoRecetChatsText}>No Recent Chats!!</Text>
+          </View>
+        </View>
+      )}
+
       <View
         style={styles.container}
         onTouchStart={() => toggleShowSearchBox(false)}>
         {!seachChatText ? (
           <FlatList
             style={styles.recentChats}
-            data={users}
+            data={recentChatUsers}
             renderItem={({item}) => (
               <RecentChat
                 handleOpenImageModal={handleOpenImageModal}
                 navigation={navigation}
                 userInfo={item}
-                key={item.id}
+                key={item.user_id}
               />
             )}
-            keyExtractor={_ => _.id}
+            keyExtractor={_ => _.user_id}
           />
         ) : (
           <>
@@ -112,7 +136,7 @@ export default function HomeScreen({navigation}) {
               )}
               keyExtractor={_ => _.id}
             />
-            {searchResultUsers.length <= 0 && (
+            {searchResultUsers?.length <= 0 && (
               <ListItem
                 style={styles.nothingFoundSearch}
                 containerStyle={{
@@ -137,6 +161,13 @@ export default function HomeScreen({navigation}) {
         )}
       </View>
 
+      <FAB
+        color="#CCE5FF"
+        icon={() => <Icon name="add" type="ionicon" />}
+        placement="right"
+        style={{padding: 5}}
+      />
+
       <ImageModal
         images={{uri: imageToBeShownOnModal}}
         showImageModal={showImageModal}
@@ -148,6 +179,18 @@ export default function HomeScreen({navigation}) {
 }
 
 const styles = StyleSheet.create({
+  NoRecetChatsContainer: {
+    height: 45,
+    backgroundColor: '#CCE5FF',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    elevation: 4,
+  },
+  NoRecetChatsText: {
+    fontSize: 18,
+    textAlign: 'center',
+    color: '#596998',
+  },
   container: {
     flex: 1,
     backgroundColor: '#fff',

@@ -11,11 +11,12 @@ export default React.memo(({navigation, handleOpenImageModal, userInfo}) => {
           userInfo: userInfo,
         })
       }>
-      <TouchableOpacity onPress={() => handleOpenImageModal(userInfo.image)}>
+      <TouchableOpacity
+        onPress={() => handleOpenImageModal(userInfo.user_image)}>
         <Avatar
           rounded
           source={{
-            uri: userInfo?.image,
+            uri: userInfo?.user_image,
           }}
         />
       </TouchableOpacity>

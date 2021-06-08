@@ -56,7 +56,7 @@ export default function ChatScreen({route, navigation}) {
         id: Math.random().toString(),
         textMessage: textMessageToBeSent.trim(),
         time: moment().format('HH:mm'),
-        sentByUserId: meUserInfo?.id,
+        sentByUserId: meUserInfo?.user_id,
       },
       ...chats,
     ]);
@@ -72,7 +72,7 @@ export default function ChatScreen({route, navigation}) {
         }}
         leftComponent={
           <ChatScreenHeaderLeft
-            userImage={userInfo?.image}
+            userImage={userInfo?.user_image}
             handleOpenImageModal={handleOpenImageModal}
             navigation={navigation}
           />
@@ -84,11 +84,7 @@ export default function ChatScreen({route, navigation}) {
           style={styles.chatList}
           data={chats}
           renderItem={({item}) => (
-            <ChatBox
-              data={item}
-              isMe={meUserInfo?.id === item?.sentByUserId}
-              key={item.id}
-            />
+            <ChatBox data={item} isMe={meUserInfo?.isMe} key={item.id} />
           )}
           keyExtractor={_ => _.id}
           inverted
@@ -110,7 +106,7 @@ export default function ChatScreen({route, navigation}) {
       <ImageModal
         handleCloseImageModal={handleCloseImageModal}
         showImageModal={showImageModal}
-        images={{uri: userInfo?.image}}
+        images={{uri: userInfo?.user_image}}
       />
     </>
   );
