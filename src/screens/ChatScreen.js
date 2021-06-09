@@ -66,7 +66,7 @@ export default function ChatScreen({route, navigation}) {
       console.log('listened changes');
     });
 
-    // let index = 0;
+    let index = 0;
     // const have = setInterval(() => {
     //   insertChats({
     //     uid: 'string' + (Math.random() * 1000).toString(),

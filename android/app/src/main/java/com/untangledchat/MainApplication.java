@@ -13,6 +13,8 @@ import java.util.List;
 
 import com.oblador.vectoricons.VectorIconsPackage;
 
+import com.rt2zz.reactnativecontacts.ReactNativeContacts;
+
 public class MainApplication extends Application implements ReactApplication {
 
   private final ReactNativeHost mReactNativeHost = new ReactNativeHost(this) {
@@ -25,6 +27,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       @SuppressWarnings("UnnecessaryLocalVariable")
       List<ReactPackage> packages = new PackageList(this).getPackages();
+      // packages.add(new ReactNativeContacts());
       // packages.add(new VectorIconsPackage());
       // Packages that cannot be autolinked yet can be added manually here, for
       // example:

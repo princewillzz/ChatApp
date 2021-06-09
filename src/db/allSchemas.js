@@ -21,6 +21,7 @@ export const RecentChatUsersSchema = {
     user_image: 'string?',
     unseen_msg_count: 'int?',
     last_unseen_msg: 'string?',
+    last_updated: 'date',
   },
 };
 

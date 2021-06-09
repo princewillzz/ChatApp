@@ -4,7 +4,7 @@ import {RecentChatUsersSchema, RECENT_CHAT_USERS_SCHEMA} from './allSchemas';
 const RecentChatUserdatabaseOptions = {
   path: 'untangledchat.recent_chat_users.realm',
   schema: [RecentChatUsersSchema],
-  schemaVersion: 1,
+  schemaVersion: 2,
 };
 
 export const fetchAllRecentChatUsers = () =>
