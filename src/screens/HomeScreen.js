@@ -1,18 +1,18 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import {FlatList, StyleSheet, View} from 'react-native';
-import {getContactsMatchingString} from 'react-native-contacts';
-import {FAB, Header, Icon, ListItem, Text} from 'react-native-elements';
-import {TouchableOpacity} from 'react-native-gesture-handler';
-import {users} from '../api/users';
+import {Header, Icon, ListItem} from 'react-native-elements';
 import AuthContext from '../auth/auth';
+import CustomBottonFloatingSyncButton from '../components/CustomBottonFloatingSyncButton';
 import HomeHeaderLeftView from '../components/HomeHeaderLeftView';
 import HomeHeaderRightView from '../components/HomeHeaderRightView';
 import ImageModal from '../components/ImageModal';
 import RecentChat from '../components/RecentChat';
 import SearchBox from '../components/SearchBox';
-import {fetchAllRecentChatUsers} from '../db/recent_chat_users';
-
-import Contacts from 'react-native-contacts';
+import {
+  fetchAllRecentChatUsers,
+  recentChatsSchemaRealmObject,
+  removeAllRecentChats,
+} from '../db/recent_chat_users';
 
 export default function HomeScreen({navigation}) {
   const {currentUserInfo} = React.useContext(AuthContext);
@@ -57,28 +57,28 @@ export default function HomeScreen({navigation}) {
   };
 
   useEffect(() => {
+    // removeAllRecentChats().then(() => {
     fetchAllRecentChatUsers()
       .then(recentChatUsers => {
-        console.log(recentChatUsers);
         setRecentChatUsers(recentChatUsers);
         // setRecentChatUsers(users);
       })
       .catch(e => {
         console.log(e);
       });
-  }, []);
+    // });
 
-  // sync contacts
-  const handleSyncContacts = async () => {
-    Contacts.getAll().then(contacts => {
-      contacts.forEach(contact => {
-        console.log(
-          contact.displayName,
-          contact.phoneNumbers.map(phnNumbers => phnNumbers.number),
-        );
-      });
+    recentChatsSchemaRealmObject.addListener('change', () => {
+      // setRecentChatUsers(recentChatUsers);
+      fetchAllRecentChatUsers()
+        .then(recentChatUsers => {
+          setRecentChatUsers(recentChatUsers);
+        })
+        .catch(e => {
+          console.log(e);
+        });
     });
-  };
+  }, []);
 
   return (
     <>
@@ -192,12 +192,9 @@ export default function HomeScreen({navigation}) {
         )}
       </View>
 
-      <FAB
-        color="#CCE5FF"
-        icon={() => <Icon name="add" type="ionicon" />}
-        placement="right"
-        style={{padding: 5}}
-        onPress={handleSyncContacts}
+      <CustomBottonFloatingSyncButton
+        currentUserInfo={currentUserInfo}
+        recentChatUsers={recentChatUsers}
       />
 
       <ImageModal

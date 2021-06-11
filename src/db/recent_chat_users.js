@@ -16,3 +16,31 @@ export const fetchAllRecentChatUsers = () =>
       })
       .catch(error => reject(error));
   });
+
+export const saveRecentChatUserToDB = userDetails =>
+  new Promise((resolve, reject) => {
+    Realm.open(RecentChatUserdatabaseOptions)
+      .then(realm => {
+        realm.write(() => {
+          realm.create(RECENT_CHAT_USERS_SCHEMA, userDetails);
+          resolve();
+        });
+      })
+      .catch(error => reject(error));
+  });
+
+export const removeAllRecentChats = () =>
+  new Promise((resolve, reject) => {
+    Realm.open(RecentChatUserdatabaseOptions)
+      .then(realm => {
+        realm.write(() => {
+          realm.deleteAll();
+          resolve();
+        });
+      })
+      .catch(error => reject(error));
+  });
+
+export const recentChatsSchemaRealmObject = new Realm(
+  RecentChatUserdatabaseOptions,
+);

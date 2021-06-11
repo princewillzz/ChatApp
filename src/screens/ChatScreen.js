@@ -28,7 +28,9 @@ export default function ChatScreen({route, navigation}) {
 
   const {currentUserInfo: meUserInfo} = React.useContext(AuthContext);
 
-  const {userInfo} = route.params;
+  const [userInfo, setUserInfo] = useState({});
+
+  // console.log('userinfo------', userInfo);
 
   // show image modal
   const [showImageModal, setShowImageModal] = useState(false);
@@ -57,6 +59,8 @@ export default function ChatScreen({route, navigation}) {
   const [textMessageToBeSent, setTextMessageToBeSent] = useState('');
 
   useEffect(() => {
+    const {userInfo} = route.params;
+    setUserInfo(JSON.parse(userInfo));
     // deleteAllChats();
     console.log('useeffect');
     // realm = new Realm({schema: [ChatsSchema]});
@@ -117,6 +121,7 @@ export default function ChatScreen({route, navigation}) {
         leftComponent={
           <ChatScreenHeaderLeft
             userImage={userInfo?.user_image}
+            displayName={userInfo?.username}
             handleOpenImageModal={handleOpenImageModal}
             navigation={navigation}
           />

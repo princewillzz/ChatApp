@@ -3,16 +3,17 @@ import {StyleSheet, TouchableOpacity} from 'react-native';
 import {Avatar, ListItem} from 'react-native-elements';
 
 export default React.memo(({navigation, handleOpenImageModal, userInfo}) => {
+  console.log(userInfo);
   return (
     <ListItem
       bottomDivider
       onPress={() =>
         navigation.push('Chat', {
-          userInfo: userInfo,
+          userInfo: JSON.stringify(userInfo),
         })
       }>
       <TouchableOpacity
-        onPress={() => handleOpenImageModal(userInfo.user_image)}>
+        onPress={() => handleOpenImageModal(userInfo?.user_image)}>
         <Avatar
           rounded
           source={{
