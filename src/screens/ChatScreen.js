@@ -121,7 +121,7 @@ export default function ChatScreen({route, navigation}) {
         leftComponent={
           <ChatScreenHeaderLeft
             userImage={userInfo?.user_image}
-            displayName={userInfo?.username}
+            displayName={userInfo?.displayName}
             handleOpenImageModal={handleOpenImageModal}
             navigation={navigation}
           />

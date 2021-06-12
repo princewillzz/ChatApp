@@ -22,7 +22,7 @@ export default React.memo(({navigation, handleOpenImageModal, userInfo}) => {
         />
       </TouchableOpacity>
       <ListItem.Content>
-        <ListItem.Title>{userInfo?.username}</ListItem.Title>
+        <ListItem.Title>{userInfo?.displayName}</ListItem.Title>
         <ListItem.Subtitle>Some chat</ListItem.Subtitle>
       </ListItem.Content>
       <ListItem.Chevron size={32} />

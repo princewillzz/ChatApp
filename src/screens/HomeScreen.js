@@ -8,6 +8,7 @@ import HomeHeaderRightView from '../components/HomeHeaderRightView';
 import ImageModal from '../components/ImageModal';
 import RecentChat from '../components/RecentChat';
 import SearchBox from '../components/SearchBox';
+import Contacts from 'react-native-contacts';
 import {
   fetchAllRecentChatUsers,
   recentChatsSchemaRealmObject,
@@ -51,34 +52,27 @@ export default function HomeScreen({navigation}) {
 
     setSearchResultUsers(
       recentChatUsers.filter(user =>
-        user.username.toLowerCase().includes(value),
+        user.displayName.toLowerCase().includes(value),
       ),
     );
   };
 
   useEffect(() => {
-    // removeAllRecentChats().then(() => {
-    fetchAllRecentChatUsers()
-      .then(recentChatUsers => {
-        setRecentChatUsers(recentChatUsers);
-        // setRecentChatUsers(users);
-      })
-      .catch(e => {
-        console.log(e);
-      });
-    // });
+    loadRecentChatUserFromTheDataStore();
 
-    recentChatsSchemaRealmObject.addListener('change', () => {
-      // setRecentChatUsers(recentChatUsers);
-      fetchAllRecentChatUsers()
-        .then(recentChatUsers => {
-          setRecentChatUsers(recentChatUsers);
-        })
-        .catch(e => {
-          console.log(e);
-        });
-    });
+    return () => {
+      recentChatsSchemaRealmObject.removeAllListeners();
+    };
   }, []);
+
+  const loadRecentChatUserFromTheDataStore = async callback => {
+    fetchAllRecentChatUsers()
+      .then(recentChatUsers => setRecentChatUsers(recentChatUsers))
+      .catch(e => console.log(e))
+      .finally(() => {
+        if (typeof callback === 'function') callback();
+      });
+  };
 
   return (
     <>
@@ -195,6 +189,7 @@ export default function HomeScreen({navigation}) {
       <CustomBottonFloatingSyncButton
         currentUserInfo={currentUserInfo}
         recentChatUsers={recentChatUsers}
+        handleContactSuccessfullySynced={loadRecentChatUserFromTheDataStore}
       />
 
       <ImageModal

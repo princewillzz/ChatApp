@@ -1,59 +1,81 @@
-import React from 'react';
+import React, {useState} from 'react';
 import Contacts from 'react-native-contacts';
-import {FAB, Icon} from 'react-native-elements';
+import {Overlay, SpeedDial} from 'react-native-elements';
 import {checkIfUsernameExistsAndFetchUsersInfo} from '../api/users-api';
-import {
-  removeAllRecentChats,
-  saveRecentChatUserToDB,
-} from '../db/recent_chat_users';
+import {saveRecentChatUserToDB} from '../db/recent_chat_users';
+import CustomSyncInfoModal from './CustomSyncInfoModal';
 
-const CustomBottonFloatingSyncButton = ({currentUserInfo, recentChatUsers}) => {
+const CustomBottonFloatingSyncButton = ({
+  currentUserInfo,
+  recentChatUsers,
+  handleContactSuccessfullySynced,
+}) => {
   const [isLoading, setIsLoading] = React.useState(false);
 
   // sync contacts
   const handleSyncContacts = async () => {
     setIsLoading(true);
-    removeAllRecentChats();
+
     try {
+      // read all contacts from the phone contact book
       const contacts = await Contacts.getAll();
-
-      const allPhoneNumbers = contacts.flatMap(contact =>
-        contact.phoneNumbers.map(c =>
-          removeSpecialCharacterFromNumber(c.number),
-        ),
-      );
-
-      const contactToBeSynced = allPhoneNumbers.filter(
-        phoneNumber =>
-          !recentChatUsers.find(user => user.username === phoneNumber),
-      );
-
-      const allPromises = contactToBeSynced
-        .filter(contact => contact && contact !== currentUserInfo?.username)
-        .map(contact =>
-          checkIfUsernameExistsAndFetchUsersInfo(
-            contact,
-            currentUserInfo.token_id,
-          )
-            .then(userInfo => {
-              saveFriendsInfoToDB(userInfo)
-                .catch(() => {})
-                .finally(() =>
-                  setTimeout(() => {
-                    setIsLoading(false);
-                  }, 1000),
-                );
-            })
-            .catch(e => {
-              console.log(e);
-              setIsLoading(false);
-            }),
+      // filter and manipulate contact info that are required
+      const contactsToBeSynced = contacts
+        .flatMap(eachContact =>
+          eachContact.phoneNumbers.map(contactNumber => {
+            return {
+              number: removeSpecialCharacterFromNumber(contactNumber.number),
+              displayName: eachContact.displayName,
+            };
+          }),
+        )
+        .filter(
+          manipulatedContactInfo =>
+            manipulatedContactInfo &&
+            !recentChatUsers.find(
+              user => user.username === manipulatedContactInfo.number,
+            ) &&
+            currentUserInfo.username !== manipulatedContactInfo.number,
         );
 
-      Promise.all(allPromises);
+      // process the contacts to be synced and store in the db
+      // contactsToBeSynced.forEach(c => console.log(c));
+
+      let count = 0;
+      contactsToBeSynced.map(eachContact =>
+        checkIfUsernameExistsAndFetchUsersInfo(
+          eachContact.number,
+          currentUserInfo.token_id,
+        )
+          .then(async contactUserInfo => {
+            try {
+              await saveFriendsInfoToDB(contactUserInfo, eachContact);
+            } catch (error) {
+              console.log('error saving- ', error);
+            }
+            // console.log(++count);
+            ++count >= contactsToBeSynced.length &&
+              handleAllContactHasBeenSynced();
+          })
+          .catch(e => {
+            // console.log(e, ++count);
+            ++count >= contactsToBeSynced.length &&
+              handleAllContactHasBeenSynced();
+          }),
+      );
     } catch (error) {
       setIsLoading(false);
     }
+  };
+
+  const handleAllContactHasBeenSynced = () => {
+    console.log('congo');
+    handleContactSuccessfullySynced(() =>
+      setTimeout(() => {
+        setIsLoading(false);
+        setOpen(false);
+      }, 5000),
+    );
   };
 
   const removeSpecialCharacterFromNumber = contactNumber => {
@@ -65,11 +87,15 @@ const CustomBottonFloatingSyncButton = ({currentUserInfo, recentChatUsers}) => {
     return number;
   };
 
-  const saveFriendsInfoToDB = async userInfo => {
+  const saveFriendsInfoToDB = async (
+    apiResponseUserInfo,
+    usersContactBookInfo,
+  ) => {
     const friendsUserInfo = {
-      user_id: userInfo.id,
-      username: userInfo.username,
-      user_image: userInfo?.image,
+      user_id: apiResponseUserInfo.id,
+      username: apiResponseUserInfo.username,
+      displayName: usersContactBookInfo.displayName,
+      user_image: apiResponseUserInfo?.image,
       unseen_msg_count: 0,
       last_updated: new Date(1),
     };
@@ -80,15 +106,45 @@ const CustomBottonFloatingSyncButton = ({currentUserInfo, recentChatUsers}) => {
       });
   };
 
+  // useEffect(() => {
+  //   removeAllRecentChats();
+  // }, []);
+
+  const [open, setOpen] = useState(false);
   return (
-    <FAB
-      color="#CCE5FF"
-      icon={() => <Icon name="add" type="ionicon" />}
-      placement="right"
-      style={{padding: 5}}
-      onPress={handleSyncContacts}
-      loading={isLoading}
-    />
+    <>
+      {/* <FAB
+        color="#CCE5FF"
+        icon={() => <Icon name="add" type="ionicon" />}
+        placement="right"
+        style={{padding: 5}}
+        onPress={handleSyncContacts}
+        loading={isLoading}
+      /> */}
+
+      <SpeedDial
+        color={'#CCE5FF'}
+        isOpen={open}
+        containerStyle={{margin: 5}}
+        icon={{name: 'add', type: 'ionicon'}}
+        openIcon={{name: 'close', type: 'ionicon'}}
+        onOpen={() => setOpen(!open)}
+        onClose={() => setOpen(!open)}
+        loading={isLoading}>
+        <SpeedDial.Action
+          color="pink"
+          icon={{
+            name: 'sync-outline',
+            type: 'ionicon',
+          }}
+          title={isLoading ? 'Syncing' : 'Sync contacts'}
+          loading={isLoading}
+          onPress={handleSyncContacts}
+        />
+      </SpeedDial>
+
+      <Overlay visible={isLoading} ModalComponent={CustomSyncInfoModal} />
+    </>
   );
 };
 
