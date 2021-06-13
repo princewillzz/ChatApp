@@ -48,6 +48,7 @@ const CustomBottonFloatingSyncButton = ({
           currentUserInfo.token_id,
         )
           .then(async contactUserInfo => {
+            console.log(count);
             try {
               await saveFriendsInfoToDB(contactUserInfo, eachContact);
             } catch (error) {
@@ -58,11 +59,16 @@ const CustomBottonFloatingSyncButton = ({
               handleAllContactHasBeenSynced();
           })
           .catch(e => {
-            // console.log(e, ++count);
+            console.log(e, count);
             ++count >= contactsToBeSynced.length &&
               handleAllContactHasBeenSynced();
           }),
       );
+      if (contactsToBeSynced.length <= 0)
+        setTimeout(() => {
+          setIsLoading(false);
+          setOpen(false);
+        }, 1000);
     } catch (error) {
       setIsLoading(false);
     }
@@ -74,7 +80,7 @@ const CustomBottonFloatingSyncButton = ({
       setTimeout(() => {
         setIsLoading(false);
         setOpen(false);
-      }, 5000),
+      }, 1000),
     );
   };
 

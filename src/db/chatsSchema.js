@@ -4,7 +4,7 @@ import {ChatsSchema, CHATS_SCHEMA} from './allSchemas';
 const ChatsdatabaseOptions = {
   path: 'untangledchat.chats.realm',
   schema: [ChatsSchema],
-  schemaVersion: 1,
+  schemaVersion: 3,
 };
 
 export const insertChats = chatDetails =>
@@ -24,6 +24,19 @@ export const fetchAllChats = () =>
     Realm.open(ChatsdatabaseOptions)
       .then(realm => {
         const chats = realm.objects(CHATS_SCHEMA);
+        resolve(chats);
+      })
+      .catch(error => reject(error));
+  });
+
+export const fethAllChatsSortedByDateForUser = friendUserId =>
+  new Promise((resolve, reject) => {
+    Realm.open(ChatsdatabaseOptions)
+      .then(realm => {
+        const chats = realm
+          .objects(CHATS_SCHEMA)
+          .filtered(`send_to_id == "${friendUserId}"`)
+          .sorted('timestamp', true);
         resolve(chats);
       })
       .catch(error => reject(error));

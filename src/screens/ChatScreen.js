@@ -1,4 +1,3 @@
-import moment from 'moment';
 import React, {useCallback, useEffect, useState} from 'react';
 import {
   FlatList,
@@ -9,28 +8,34 @@ import {
   View,
 } from 'react-native';
 import {Header, Icon} from 'react-native-elements';
+import {sendTextMessageToFriend} from '../api/message-api';
 import AuthContext from '../auth/auth';
 import ChatBox from '../components/ChatBox';
 import ChatScreenHeaderLeft from '../components/ChatScreenHeaderLeft';
 import ChatScreenHeaderRight from '../components/ChatScreenHeaderRight';
 import ImageModal from '../components/ImageModal';
-
-import Realm from 'realm';
-import {ChatsSchema, CHATS_SCHEMA} from '../db/allSchemas';
 import {
   chatSchemaRealmObject,
   deleteAllChats,
+  fethAllChatsSortedByDateForUser,
   insertChats,
 } from '../db/chatsSchema';
 
 export default function ChatScreen({route, navigation}) {
-  // const meUserInfo?.id = "12"; // to be removed later on
-
   const {currentUserInfo: meUserInfo} = React.useContext(AuthContext);
 
   const [userInfo, setUserInfo] = useState({});
 
-  // console.log('userinfo------', userInfo);
+  // controlling chats to be loaded
+  const [chats, setChats] = useState([]); // all chats
+
+  const [noOfChatsToBeLoaded, setNoOfChatsToBeLoaded] = useState(9);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const handleLoadMoreChat = async moreChats => {
+    console.log(noOfChatsToBeLoaded);
+    setNoOfChatsToBeLoaded(noOfChatsToBeLoaded + moreChats);
+  };
 
   // show image modal
   const [showImageModal, setShowImageModal] = useState(false);
@@ -38,76 +43,52 @@ export default function ChatScreen({route, navigation}) {
     setShowImageModal(true);
   }, []);
   const handleCloseImageModal = useCallback(() => setShowImageModal(false), []);
-
   // end of show image modal
-
-  const [chats, setChats] = useState([
-    {
-      id: '1',
-      textMessage: 'lorem ipsum',
-      time: '12:90',
-      sentByUserId: '123',
-    },
-    {
-      id: '2',
-      textMessage: ' not ipsum',
-      time: '12:90',
-      sentByUserId: '12',
-    },
-  ]);
 
   const [textMessageToBeSent, setTextMessageToBeSent] = useState('');
 
   useEffect(() => {
-    const {userInfo} = route.params;
-    setUserInfo(JSON.parse(userInfo));
     // deleteAllChats();
-    console.log('useeffect');
-    // realm = new Realm({schema: [ChatsSchema]});
+
+    const {userInfo} = route.params;
+    let friendUserInfo = JSON.parse(userInfo);
+    setUserInfo(friendUserInfo);
+    fethAllChatsSortedByDateForUser(friendUserInfo?.username)
+      .then(chats => setChats(chats))
+      .catch(e => {
+        console.log(e, 'Not loaded chats');
+      });
 
     // add a listener to chatschema
-    chatSchemaRealmObject.addListener('change', () => {
-      console.log('listened changes');
+    chatSchemaRealmObject.addListener('change', (newCollection, changes) => {
+      // console.log('listened changes in chat');
+      // console.log(newCollection, changes, chats.length);
+      setRefreshing(true);
+      setTimeout(() => {
+        setRefreshing(false);
+      }, 0);
+
+      handleLoadMoreChat(1);
     });
 
-    let index = 0;
-    // const have = setInterval(() => {
-    //   insertChats({
-    //     uid: 'string' + (Math.random() * 1000).toString(),
-    //     type: 'string',
-    //     text: 'string?',
-    //     link: 'string?',
-    //     timestamp: new Date(),
-    //     // Is me
-    //     isMe: false,
-    //     // sent info
-    //     send_to_id: 'string',
-    //   })
-    //     .then(() => {
-    //       console.log('chats');
-    //     })
-    //     .catch(e => {
-    //       console.log('error' + e);
-    //     });
-
-    //   index++;
-    //   if (index === 5) {
-    //     clearInterval(have);
-    //   }
-    // }, 1000);
+    return () => {
+      chatSchemaRealmObject.removeAllListeners();
+    };
   }, []);
 
   const handleSendMessage = async () => {
-    setChats([
-      {
-        id: Math.random().toString(),
-        textMessage: textMessageToBeSent.trim(),
-        time: moment().format('HH:mm'),
-        sentByUserId: meUserInfo?.user_id,
-        isMe: true,
-      },
-      ...chats,
-    ]);
+    const textChat = {
+      uid: Math.random().toString(),
+      textMessage: textMessageToBeSent.trim(),
+      timestamp: new Date(),
+      isMe: true,
+      type: 'text',
+      send_to_id: userInfo?.username,
+    };
+
+    insertChats(textChat).catch(e => console.log(e));
+
+    sendTextMessageToFriend(textChat);
 
     setTextMessageToBeSent('');
   };
@@ -131,11 +112,14 @@ export default function ChatScreen({route, navigation}) {
       <KeyboardAvoidingView style={styles.container}>
         <FlatList
           style={styles.chatList}
-          data={chats}
+          refreshing={refreshing}
+          data={chats.slice(0, noOfChatsToBeLoaded)}
           renderItem={({item}) => (
-            <ChatBox data={item} isMe={item.isMe} key={item.id} />
+            <ChatBox data={item} isMe={item.isMe} key={item.uid} />
           )}
-          keyExtractor={_ => _.id}
+          keyExtractor={_ => _.uid}
+          onEndReached={() => handleLoadMoreChat(2)}
+          onEndReachedThreshold={0.2}
           inverted
         />
         <View style={styles.messageInputContainer}>

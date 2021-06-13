@@ -60,6 +60,7 @@ export default function HomeScreen({navigation}) {
   useEffect(() => {
     loadRecentChatUserFromTheDataStore();
 
+    // removeAllRecentChats();
     return () => {
       recentChatsSchemaRealmObject.removeAllListeners();
     };

@@ -32,7 +32,7 @@ export const ChatsSchema = {
   properties: {
     uid: 'string',
     type: 'string',
-    text: 'string?',
+    textMessage: 'string?',
     link: 'string?',
     timestamp: 'date',
     // Is me

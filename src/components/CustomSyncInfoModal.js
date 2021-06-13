@@ -20,11 +20,17 @@ const CustomSyncInfoModal = ({visible}) => {
             <Icon name="cloud-download-outline" type="ionicon" />
           </View>
           {/* <Button></Button> */}
-          {!visible && (
+          {!visible ? (
             <Pressable
               style={[styles.button, styles.buttonClose]}
               onPress={() => setOpen(!open)}>
               <Text style={styles.textStyle}>Close</Text>
+            </Pressable>
+          ) : (
+            <Pressable
+              style={[styles.button, styles.buttonClose]}
+              onPress={() => setOpen(!open)}>
+              <Text style={styles.textStyle}>Cancel</Text>
             </Pressable>
           )}
         </View>

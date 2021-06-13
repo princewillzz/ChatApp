@@ -15,10 +15,28 @@ export default function ChatScreenHeaderLeft({
         onPress={() => navigation.pop()}>
         <Icon name="arrow-back-outline" type="ionicon" />
       </TouchableOpacity>
+
       <TouchableOpacity
         style={styles.chatingWithAvatar}
-        onPress={handleOpenImageModal}>
-        <Avatar rounded source={{uri: userImage}} />
+        onPress={userImage && handleOpenImageModal}>
+        {userImage ? (
+          <Avatar
+            rounded
+            source={{
+              uri: userImage,
+            }}
+            containerStyle={{backgroundColor: 'silver'}}
+            title={displayName && displayName[0]}
+            icon={{name: 'person-outline', type: 'ionicon'}}
+          />
+        ) : (
+          <Avatar
+            rounded
+            containerStyle={{backgroundColor: 'silver'}}
+            title={displayName && displayName[0]}
+            icon={{name: 'person-outline', type: 'ionicon'}}
+          />
+        )}
         <Text style={styles.chatWithName}>{displayName}</Text>
       </TouchableOpacity>
     </View>

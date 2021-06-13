@@ -1,14 +1,37 @@
-import React from 'react';
 import {StyleSheet, Text, View} from 'react-native';
 
-export default function ChatBox({isMe, data}) {
-  return (
-    <View style={isMe ? styles.sentBox : styles.receivedBox}>
-      <Text>{data.textMessage}</Text>
-      <Text style={styles.time}>{data.time}</Text>
-    </View>
-  );
+import React, {PureComponent} from 'react';
+
+export default class ChatBox extends PureComponent {
+  render() {
+    console.log('hi', this.props.data.uid);
+    return (
+      <View style={this.props.isMe ? styles.sentBox : styles.receivedBox}>
+        <Text>{this.props.data.textMessage}</Text>
+        <Text style={styles.time}>{`${(
+          '0' + this.props.data.timestamp.getHours()
+        ).slice(-2)}:${('0' + this.props.data.timestamp.getMinutes()).slice(
+          -2,
+        )}`}</Text>
+      </View>
+    );
+  }
 }
+
+// export default function ChatBox({isMe, data}) {
+//   React.useEffect(() => {
+//     console.log('useeffect');
+//   }, []);
+//   console.log('hi', data.uid);
+//   return (
+//     <View style={isMe ? styles.sentBox : styles.receivedBox}>
+//       <Text>{data.textMessage}</Text>
+//       <Text style={styles.time}>{`${('0' + data.timestamp.getHours()).slice(
+//         -2,
+//       )}:${('0' + data.timestamp.getMinutes()).slice(-2)}`}</Text>
+//     </View>
+//   );
+// }
 
 const styles = StyleSheet.create({
   receivedBox: {
