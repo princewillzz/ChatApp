@@ -4,7 +4,7 @@ import React, {PureComponent} from 'react';
 
 export default class ChatBox extends PureComponent {
   render() {
-    console.log('hi', this.props.data.uid);
+    // console.log('hi', this.props.data.uid);
     return (
       <View style={this.props.isMe ? styles.sentBox : styles.receivedBox}>
         <Text>{this.props.data.textMessage}</Text>

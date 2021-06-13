@@ -13,7 +13,11 @@ import {
   fetchAllRecentChatUsers,
   recentChatsSchemaRealmObject,
   removeAllRecentChats,
+  updateLastMessageAndCount,
 } from '../db/recent_chat_users';
+import {useRef} from 'react';
+import {messagingWebsocketConnectionURI} from '../../config';
+import {insertChats} from '../db/chatsSchema';
 
 export default function HomeScreen({navigation}) {
   const {currentUserInfo} = React.useContext(AuthContext);
@@ -57,14 +61,84 @@ export default function HomeScreen({navigation}) {
     );
   };
 
+  const [refreshingRecentFlatList, setRefreshingRecentFlatList] =
+    useState(false);
+
   useEffect(() => {
     loadRecentChatUserFromTheDataStore();
 
+    setTimeout(() => {
+      initiateWebsocketConnection();
+    }, 1000);
+
+    recentChatsSchemaRealmObject.addListener('change', () => {
+      setRefreshingRecentFlatList(true);
+      setTimeout(() => {
+        setRefreshingRecentFlatList(false);
+      }, 0);
+    });
+
     // removeAllRecentChats();
     return () => {
+      handleDisconnectMessagingWebsocket();
       recentChatsSchemaRealmObject.removeAllListeners();
     };
   }, []);
+
+  const websocket = useRef(null);
+
+  const initiateWebsocketConnection = async () => {
+    websocket.current = new WebSocket(
+      `${messagingWebsocketConnectionURI}?token=${currentUserInfo.token_id}`,
+    );
+    websocket.current.onopen = handleOnMessageWebsocketOpen;
+    websocket.current.onmessage = handleOnMessageWebsocketMessageReceived;
+    websocket.current.onerror = handleOnMessageWebsocketError;
+    websocket.current.onclose = handleOnMessageWebsocketClose;
+  };
+
+  const handleOnMessageWebsocketOpen = async () => {
+    console.log('Connected');
+  };
+
+  const activeChatingWithFriendId = useRef(null);
+
+  const handleChangeActiveChatingWithFriendId = userId => {
+    activeChatingWithFriendId.current = userId;
+    console.log(userId);
+  };
+
+  const handleOnMessageWebsocketMessageReceived = async e => {
+    const messageReceived = JSON.parse(e.data);
+    // console.log(typeof messageReceived, messageReceived.sentBy);
+    const chatMessage = {
+      uid: Math.random().toString(), //messageReceived.id,
+      textMessage: messageReceived.message,
+      timestamp: new Date(),
+      isMe: false,
+      type: 'text',
+      send_to_id: messageReceived.sentBy,
+    };
+    updateLastMessageAndCount(
+      chatMessage.send_to_id,
+      chatMessage.textMessage,
+      activeChatingWithFriendId.current,
+    )
+      .then(() => console.log('message: ', chatMessage.textMessage))
+      .catch(e => console.log(e));
+
+    // console.log(chatMessage.textMessage);
+    insertChats(chatMessage).catch(e => console.log(e));
+  };
+  const handleOnMessageWebsocketError = async e => {
+    console.log('Errored out', e);
+  };
+  const handleDisconnectMessagingWebsocket = async () => {
+    websocket.current.close();
+  };
+  const handleOnMessageWebsocketClose = async e => {
+    console.log('Disconnected', e);
+  };
 
   const loadRecentChatUserFromTheDataStore = async callback => {
     fetchAllRecentChatUsers()
@@ -137,12 +211,16 @@ export default function HomeScreen({navigation}) {
             data={recentChatUsers}
             renderItem={({item}) => (
               <RecentChat
+                handleChangeActiveChatingWithFriendId={
+                  handleChangeActiveChatingWithFriendId
+                }
                 handleOpenImageModal={handleOpenImageModal}
                 navigation={navigation}
                 userInfo={item}
                 key={item.user_id}
               />
             )}
+            refreshing={refreshingRecentFlatList}
             keyExtractor={_ => _.user_id}
           />
         ) : (

@@ -20,6 +20,7 @@ import {
   fethAllChatsSortedByDateForUser,
   insertChats,
 } from '../db/chatsSchema';
+import {resetUnSeenMessageCount} from '../db/recent_chat_users';
 
 export default function ChatScreen({route, navigation}) {
   const {currentUserInfo: meUserInfo} = React.useContext(AuthContext);
@@ -33,7 +34,7 @@ export default function ChatScreen({route, navigation}) {
   const [refreshing, setRefreshing] = useState(false);
 
   const handleLoadMoreChat = async moreChats => {
-    console.log(noOfChatsToBeLoaded);
+    // console.log(noOfChatsToBeLoaded);
     setNoOfChatsToBeLoaded(noOfChatsToBeLoaded + moreChats);
   };
 
@@ -71,6 +72,12 @@ export default function ChatScreen({route, navigation}) {
       handleLoadMoreChat(1);
     });
 
+    // Mark all messages as seen
+    setTimeout(() => {
+      resetUnSeenMessageCount(friendUserInfo.user_id).catch(e =>
+        console.log(e),
+      );
+    }, 0);
     return () => {
       chatSchemaRealmObject.removeAllListeners();
     };
@@ -118,8 +125,8 @@ export default function ChatScreen({route, navigation}) {
             <ChatBox data={item} isMe={item.isMe} key={item.uid} />
           )}
           keyExtractor={_ => _.uid}
-          onEndReached={() => handleLoadMoreChat(2)}
-          onEndReachedThreshold={0.2}
+          onEndReached={() => handleLoadMoreChat(10)}
+          onEndReachedThreshold={0.5}
           inverted
         />
         <View style={styles.messageInputContainer}>
