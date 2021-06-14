@@ -56,7 +56,7 @@ export default function HomeScreen({navigation}) {
 
     setSearchResultUsers(
       recentChatUsers.filter(user =>
-        user.displayName.toLowerCase().includes(value),
+        user.displayName.toLowerCase().includes(value.toLowerCase()),
       ),
     );
   };
@@ -82,6 +82,7 @@ export default function HomeScreen({navigation}) {
     return () => {
       handleDisconnectMessagingWebsocket();
       recentChatsSchemaRealmObject.removeAllListeners();
+      websocket.current = null;
     };
   }, []);
 
@@ -105,8 +106,18 @@ export default function HomeScreen({navigation}) {
 
   const handleChangeActiveChatingWithFriendId = userId => {
     activeChatingWithFriendId.current = userId;
-    console.log(userId);
+    // console.log(userId);
   };
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      handleChangeActiveChatingWithFriendId(null);
+    });
+
+    return () => {
+      activeChatingWithFriendId.current = null;
+      unsubscribe();
+    };
+  }, []);
 
   const handleOnMessageWebsocketMessageReceived = async e => {
     const messageReceived = JSON.parse(e.data);
@@ -119,12 +130,13 @@ export default function HomeScreen({navigation}) {
       type: 'text',
       send_to_id: messageReceived.sentBy,
     };
+
     updateLastMessageAndCount(
       chatMessage.send_to_id,
       chatMessage.textMessage,
       activeChatingWithFriendId.current,
     )
-      .then(() => console.log('message: ', chatMessage.textMessage))
+      // .then(() => console.log('message: ', chatMessage.textMessage))
       .catch(e => console.log(e));
 
     // console.log(chatMessage.textMessage);

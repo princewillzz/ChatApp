@@ -52,6 +52,7 @@ export default function ChatScreen({route, navigation}) {
     // deleteAllChats();
 
     const {userInfo} = route.params;
+
     let friendUserInfo = JSON.parse(userInfo);
     setUserInfo(friendUserInfo);
     fethAllChatsSortedByDateForUser(friendUserInfo?.username)
@@ -78,6 +79,7 @@ export default function ChatScreen({route, navigation}) {
         console.log(e),
       );
     }, 0);
+
     return () => {
       chatSchemaRealmObject.removeAllListeners();
     };
