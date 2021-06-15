@@ -24,6 +24,7 @@ export default function ImageModal({
         enableImageZoom
         enableSwipeDown
         onSwipeDown={handleCloseImageModal}
+        renderIndicator={() => null}
       />
     </Modal>
   );

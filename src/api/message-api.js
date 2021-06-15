@@ -1,15 +1,30 @@
 import {baseURL} from '../../config';
 
-const websocketConnectionURL = `ws://localhost:8080`;
-
 let websocket = null;
 
-const initiateConnection = async userToken => {
-  websocket = new WebSocket(
-    `${websocketConnectionURL}/websocket?token=${userToken}`,
-  );
+export const initilizeWebsocketObject = async websocketObject => {
+  websocket = websocketObject;
 };
 
+export const sendTextMessageToUser = async textMessageInfo => {
+  if (!websocket && !websocket.OPEN)
+    throw new Error('Connection not estabilshed');
+
+  const textMessageDetails = {
+    message: textMessageInfo.textMessage,
+    type: textMessageInfo.type,
+    sentTime: textMessageInfo.timestamp,
+
+    sentTo: textMessageInfo.send_to_id,
+  };
+
+  websocket.send(JSON.stringify(textMessageDetails));
+};
+
+/**
+ * @deprecated
+ * @param {*} textMessageInfo
+ */
 export const sendTextMessageToFriend = async textMessageInfo => {
   fetch(`${baseURL}/publish/${textMessageInfo.send_to_id}`, {
     method: 'POST',

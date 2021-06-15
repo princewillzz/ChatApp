@@ -1,6 +1,8 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {FlatList, StyleSheet, View} from 'react-native';
 import {Header, Icon, ListItem} from 'react-native-elements';
+import {messagingWebsocketConnectionURI} from '../../config';
+import {initilizeWebsocketObject} from '../api/message-api';
 import AuthContext from '../auth/auth';
 import CustomBottonFloatingSyncButton from '../components/CustomBottonFloatingSyncButton';
 import HomeHeaderLeftView from '../components/HomeHeaderLeftView';
@@ -8,16 +10,12 @@ import HomeHeaderRightView from '../components/HomeHeaderRightView';
 import ImageModal from '../components/ImageModal';
 import RecentChat from '../components/RecentChat';
 import SearchBox from '../components/SearchBox';
-import Contacts from 'react-native-contacts';
+import {insertChats} from '../db/chatsSchema';
 import {
   fetchAllRecentChatUsers,
   recentChatsSchemaRealmObject,
-  removeAllRecentChats,
   updateLastMessageAndCount,
 } from '../db/recent_chat_users';
-import {useRef} from 'react';
-import {messagingWebsocketConnectionURI} from '../../config';
-import {insertChats} from '../db/chatsSchema';
 
 export default function HomeScreen({navigation}) {
   const {currentUserInfo} = React.useContext(AuthContext);
@@ -88,18 +86,79 @@ export default function HomeScreen({navigation}) {
 
   const websocket = useRef(null);
 
-  const initiateWebsocketConnection = async () => {
+  const initiateWebsocketConnection = useCallback(async () => {
     websocket.current = new WebSocket(
       `${messagingWebsocketConnectionURI}?token=${currentUserInfo.token_id}`,
     );
+    initilizeWebsocketObject(websocket.current);
     websocket.current.onopen = handleOnMessageWebsocketOpen;
     websocket.current.onmessage = handleOnMessageWebsocketMessageReceived;
     websocket.current.onerror = handleOnMessageWebsocketError;
     websocket.current.onclose = handleOnMessageWebsocketClose;
-  };
+  }, []);
 
-  const handleOnMessageWebsocketOpen = async () => {
+  const handleOnMessageWebsocketOpen = useCallback(async () => {
     console.log('Connected');
+  }, []);
+
+  const handleOnMessageWebsocketMessageReceived = useCallback(async e => {
+    const messageReceived = JSON.parse(e.data);
+    // console.log(typeof messageReceived, messageReceived.sentBy);
+    const chatMessage = {
+      uid: messageReceived.id,
+      textMessage: messageReceived.message,
+      timestamp: new Date(),
+      isMe: false,
+      type: 'text',
+      send_to_id: messageReceived.sentBy,
+    };
+
+    // console.log(chatMessage.textMessage);
+    insertChats(chatMessage)
+      .then(() => {
+        updateLastMessageAndCount(
+          chatMessage.send_to_id,
+          chatMessage.textMessage,
+          activeChatingWithFriendId.current,
+        ) // .then(() => console.log('message: ', chatMessage.textMessage))
+          .catch(e => console.log(e));
+      })
+      .catch(e => console.log(e));
+  }, []);
+
+  // on Error out of the websocket
+  const handleOnMessageWebsocketError = useCallback(async e => {
+    console.log('Errored out', e);
+    console.log('Connecting again...');
+
+    websocket.current.onclose = e =>
+      handleOnMessageWebsocketClose(e, () =>
+        setTimeout(() => {
+          initiateWebsocketConnection();
+        }, 2000),
+      );
+  }, []);
+
+  // Disconnect the websocket
+  const handleDisconnectMessagingWebsocket = useCallback(async () => {
+    websocket.current.close();
+  }, []);
+
+  // On websocket gets disconnected
+  const handleOnMessageWebsocketClose = useCallback(async (e, callback) => {
+    console.log('Disconnected', e);
+    if (typeof callback === 'function') {
+      callback();
+    }
+  }, []);
+
+  const loadRecentChatUserFromTheDataStore = async callback => {
+    fetchAllRecentChatUsers()
+      .then(recentChatUsers => setRecentChatUsers(recentChatUsers))
+      .catch(e => console.log(e))
+      .finally(() => {
+        if (typeof callback === 'function') callback();
+      });
   };
 
   const activeChatingWithFriendId = useRef(null);
@@ -118,48 +177,6 @@ export default function HomeScreen({navigation}) {
       unsubscribe();
     };
   }, []);
-
-  const handleOnMessageWebsocketMessageReceived = async e => {
-    const messageReceived = JSON.parse(e.data);
-    // console.log(typeof messageReceived, messageReceived.sentBy);
-    const chatMessage = {
-      uid: Math.random().toString(), //messageReceived.id,
-      textMessage: messageReceived.message,
-      timestamp: new Date(),
-      isMe: false,
-      type: 'text',
-      send_to_id: messageReceived.sentBy,
-    };
-
-    updateLastMessageAndCount(
-      chatMessage.send_to_id,
-      chatMessage.textMessage,
-      activeChatingWithFriendId.current,
-    )
-      // .then(() => console.log('message: ', chatMessage.textMessage))
-      .catch(e => console.log(e));
-
-    // console.log(chatMessage.textMessage);
-    insertChats(chatMessage).catch(e => console.log(e));
-  };
-  const handleOnMessageWebsocketError = async e => {
-    console.log('Errored out', e);
-  };
-  const handleDisconnectMessagingWebsocket = async () => {
-    websocket.current.close();
-  };
-  const handleOnMessageWebsocketClose = async e => {
-    console.log('Disconnected', e);
-  };
-
-  const loadRecentChatUserFromTheDataStore = async callback => {
-    fetchAllRecentChatUsers()
-      .then(recentChatUsers => setRecentChatUsers(recentChatUsers))
-      .catch(e => console.log(e))
-      .finally(() => {
-        if (typeof callback === 'function') callback();
-      });
-  };
 
   return (
     <>

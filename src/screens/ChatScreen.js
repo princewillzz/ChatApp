@@ -8,7 +8,10 @@ import {
   View,
 } from 'react-native';
 import {Header, Icon} from 'react-native-elements';
-import {sendTextMessageToFriend} from '../api/message-api';
+import {
+  sendTextMessageToFriend,
+  sendTextMessageToUser,
+} from '../api/message-api';
 import AuthContext from '../auth/auth';
 import ChatBox from '../components/ChatBox';
 import ChatScreenHeaderLeft from '../components/ChatScreenHeaderLeft';
@@ -20,7 +23,10 @@ import {
   fethAllChatsSortedByDateForUser,
   insertChats,
 } from '../db/chatsSchema';
-import {resetUnSeenMessageCount} from '../db/recent_chat_users';
+import {
+  resetUnSeenMessageCount,
+  updateLastMessageAndCount,
+} from '../db/recent_chat_users';
 
 export default function ChatScreen({route, navigation}) {
   const {currentUserInfo: meUserInfo} = React.useContext(AuthContext);
@@ -95,9 +101,21 @@ export default function ChatScreen({route, navigation}) {
       send_to_id: userInfo?.username,
     };
 
-    insertChats(textChat).catch(e => console.log(e));
+    insertChats(textChat)
+      .then(() => {
+        updateLastMessageAndCount(
+          userInfo?.username,
+          textChat.textMessage,
+          userInfo?.user_id,
+        ).catch(e => console.log('last seen message update failed', e));
+      })
+      .catch(e => console.log(e));
 
-    sendTextMessageToFriend(textChat);
+    // sendTextMessageToFriend(textChat);
+
+    sendTextMessageToUser(textChat).catch(e => {
+      console.log(e);
+    });
 
     setTextMessageToBeSent('');
   };

@@ -54,7 +54,11 @@ export default React.memo(
         </TouchableOpacity>
         <ListItem.Content>
           <ListItem.Title>{userInfo?.displayName}</ListItem.Title>
-          <ListItem.Subtitle>{userInfo?.last_unseen_msg}</ListItem.Subtitle>
+          <ListItem.Subtitle>
+            {`${userInfo?.last_unseen_msg?.slice(0, 33)}${
+              userInfo?.last_unseen_msg?.length > 33 ? '...' : ''
+            }`}
+          </ListItem.Subtitle>
         </ListItem.Content>
         <ListItem.Chevron size={32} />
       </ListItem>
