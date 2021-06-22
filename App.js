@@ -71,7 +71,7 @@ export default function App() {
           .then(user => {
             if (user?.length > 0) {
               userToken = user[0].token_id;
-              console.log('UserToken', userToken);
+              // console.log('UserToken', userToken);
               handleCurrentUserInit(userToken);
 
               dispatch({type: 'RESTORE_TOKEN', token: userToken});

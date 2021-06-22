@@ -16,6 +16,7 @@ import {
   recentChatsSchemaRealmObject,
   updateLastMessageAndCount,
 } from '../db/recent_chat_users';
+import { test_rsa } from '../security/RSAEncryptionService';
 
 export default function HomeScreen({navigation}) {
   const {currentUserInfo} = React.useContext(AuthContext);
@@ -171,6 +172,8 @@ export default function HomeScreen({navigation}) {
     const unsubscribe = navigation.addListener('focus', () => {
       handleChangeActiveChatingWithFriendId(null);
     });
+
+    test_rsa().catch(e => console.log(e))
 
     return () => {
       activeChatingWithFriendId.current = null;
