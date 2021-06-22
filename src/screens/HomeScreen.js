@@ -18,7 +18,7 @@ import {
 } from '../db/recent_chat_users';
 
 export default function HomeScreen({navigation}) {
-  const {currentUserInfo} = React.useContext(AuthContext);
+  const {currentUserInfo, signOut} = React.useContext(AuthContext);
 
   const [recentChatUsers, setRecentChatUsers] = useState([]);
 
@@ -131,12 +131,10 @@ export default function HomeScreen({navigation}) {
     console.log('Errored out', e);
     console.log('Connecting again...');
 
-    websocket.current.onclose = e =>
-      handleOnMessageWebsocketClose(e, () =>
-        setTimeout(() => {
-          initiateWebsocketConnection();
-        }, 2000),
-      );
+    if (e.message.toLowerCase().includes(`'401 unauthorized'`)) {
+      signOut();
+    } 
+
   }, []);
 
   // Disconnect the websocket
@@ -147,9 +145,9 @@ export default function HomeScreen({navigation}) {
   // On websocket gets disconnected
   const handleOnMessageWebsocketClose = useCallback(async (e, callback) => {
     console.log('Disconnected', e);
-    if (typeof callback === 'function') {
-      callback();
-    }
+    setTimeout(() => {
+      initiateWebsocketConnection();
+    }, 10000)
   }, []);
 
   const loadRecentChatUserFromTheDataStore = async callback => {
