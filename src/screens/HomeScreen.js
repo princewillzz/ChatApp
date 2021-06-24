@@ -19,7 +19,7 @@ import {
 import { test_rsa } from '../security/RSAEncryptionService';
 
 export default function HomeScreen({navigation}) {
-  const {currentUserInfo} = React.useContext(AuthContext);
+  const {currentUserInfo, signOut} = React.useContext(AuthContext);
 
   const [recentChatUsers, setRecentChatUsers] = useState([]);
 
@@ -132,12 +132,12 @@ export default function HomeScreen({navigation}) {
     console.log('Errored out', e);
     console.log('Connecting again...');
 
-    websocket.current.onclose = e =>
-      handleOnMessageWebsocketClose(e, () =>
-        setTimeout(() => {
-          initiateWebsocketConnection();
-        }, 2000),
-      );
+    // websocket.current.onclose = e =>
+    //   handleOnMessageWebsocketClose(e, () =>
+    //     setTimeout(() => {
+    //       initiateWebsocketConnection();
+    //     }, 2000),
+    //   );
   }, []);
 
   // Disconnect the websocket
@@ -146,10 +146,15 @@ export default function HomeScreen({navigation}) {
   }, []);
 
   // On websocket gets disconnected
-  const handleOnMessageWebsocketClose = useCallback(async (e, callback) => {
+  const handleOnMessageWebsocketClose = useCallback(async (e) => {
     console.log('Disconnected', e);
-    if (typeof callback === 'function') {
-      callback();
+
+    if (e?.message?.includes('401 Unauthorized')) {
+      signOut()
+    } else {
+      setTimeout(() => {
+        initiateWebsocketConnection();
+      }, 2000)
     }
   }, []);
 

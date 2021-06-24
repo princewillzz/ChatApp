@@ -7,7 +7,7 @@ let rsa_keys = null
  * Generate keys and initiate the public state
  * @returns Promise
  */
-export const generateRsaKeys = async ()=> {
+export const generateRsaKeys = async (userId)=> {
     return RSA.generateKeys(4096) // set key size
     .then(keys => {
         rsa_keys = keys
@@ -36,7 +36,7 @@ export const test_rsa = async () => {
     
     try {
 
-        await generateRsaKeys();
+        await generateRsaKeys("test");
 
         let msg = "harsha"
         const em = await encryptTextMessage(msg)
