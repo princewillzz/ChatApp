@@ -184,6 +184,9 @@ android {
 }
 
 dependencies {
+
+    implementation project(':react-native-secure-storage')
+
     implementation project(':react-native-contacts')
 
     implementation fileTree(dir: "libs", include: ["*.jar"])

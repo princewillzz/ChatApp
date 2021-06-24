@@ -14,9 +14,10 @@ import {insertChats} from '../db/chatsSchema';
 import {
   fetchAllRecentChatUsers,
   recentChatsSchemaRealmObject,
+  removeAllRecentChats,
   updateLastMessageAndCount,
 } from '../db/recent_chat_users';
-import { test_rsa } from '../security/RSAEncryptionService';
+import { decryptTestMessage, initiateRSAKeysInitialization, test_rsa } from '../security/RSAEncryptionService';
 
 export default function HomeScreen({navigation}) {
   const {currentUserInfo, signOut} = React.useContext(AuthContext);
@@ -105,26 +106,34 @@ export default function HomeScreen({navigation}) {
   const handleOnMessageWebsocketMessageReceived = useCallback(async e => {
     const messageReceived = JSON.parse(e.data);
     // console.log(typeof messageReceived, messageReceived.sentBy);
-    const chatMessage = {
-      uid: messageReceived.id,
-      textMessage: messageReceived.message,
-      timestamp: new Date(),
-      isMe: false,
-      type: 'text',
-      send_to_id: messageReceived.sentBy,
-    };
+    
+    try{
+      const decodedMsg = await decryptTestMessage(messageReceived.message)
 
-    // console.log(chatMessage.textMessage);
-    insertChats(chatMessage)
-      .then(() => {
-        updateLastMessageAndCount(
-          chatMessage.send_to_id,
-          chatMessage.textMessage,
-          activeChatingWithFriendId.current,
-        ) // .then(() => console.log('message: ', chatMessage.textMessage))
-          .catch(e => console.log(e));
-      })
-      .catch(e => console.log(e));
+      const chatMessage = {
+        uid: messageReceived.id,
+        textMessage: decodedMsg,
+        timestamp: new Date(),
+        isMe: false,
+        type: 'text',
+        send_to_id: messageReceived.sentBy,
+      };
+
+      // console.log(chatMessage.textMessage);
+      insertChats(chatMessage)
+        .then(() => {
+          updateLastMessageAndCount(
+            chatMessage.send_to_id,
+            chatMessage.textMessage,
+            activeChatingWithFriendId.current,
+          ) // .then(() => console.log('message: ', chatMessage.textMessage))
+            .catch(e => console.log(e));
+        })
+        .catch(e => console.log(e));
+    }catch(e ) {
+      console.log(e);
+    }
+
   }, []);
 
   // on Error out of the websocket
@@ -132,12 +141,14 @@ export default function HomeScreen({navigation}) {
     console.log('Errored out', e);
     console.log('Connecting again...');
 
-    // websocket.current.onclose = e =>
-    //   handleOnMessageWebsocketClose(e, () =>
-    //     setTimeout(() => {
-    //       initiateWebsocketConnection();
-    //     }, 2000),
-    //   );
+    if (e?.message?.includes('401 Unauthorized')) {
+      signOut()
+    } else {
+      setTimeout(() => {
+        initiateWebsocketConnection();
+      }, 2000)
+    }
+
   }, []);
 
   // Disconnect the websocket
@@ -149,13 +160,6 @@ export default function HomeScreen({navigation}) {
   const handleOnMessageWebsocketClose = useCallback(async (e) => {
     console.log('Disconnected', e);
 
-    if (e?.message?.includes('401 Unauthorized')) {
-      signOut()
-    } else {
-      setTimeout(() => {
-        initiateWebsocketConnection();
-      }, 2000)
-    }
   }, []);
 
   const loadRecentChatUserFromTheDataStore = async callback => {
@@ -178,8 +182,10 @@ export default function HomeScreen({navigation}) {
       handleChangeActiveChatingWithFriendId(null);
     });
 
-    test_rsa().catch(e => console.log(e))
+    // test_rsa(currentUserInfo.username).catch(e => console.log(e))
+    initiateRSAKeysInitialization(currentUserInfo.username)
 
+    // removeAllRecentChats().catch(e => {})
     return () => {
       activeChatingWithFriendId.current = null;
       unsubscribe();

@@ -1,4 +1,5 @@
 import {baseURL} from '../../config';
+import { encryptTextMessage } from '../security/RSAEncryptionService';
 
 let websocket = null;
 
@@ -6,12 +7,15 @@ export const initilizeWebsocketObject = async websocketObject => {
   websocket = websocketObject;
 };
 
-export const sendTextMessageToUser = async textMessageInfo => {
+export const sendTextMessageToUser = async (textMessageInfo, rsa_public_key) => {
   if (!websocket && !websocket.OPEN)
     throw new Error('Connection not estabilshed');
 
+
+  const encodedTextMsg = await encryptTextMessage(textMessageInfo.textMessage, rsa_public_key)
+
   const textMessageDetails = {
-    message: textMessageInfo.textMessage,
+    message: encodedTextMsg,
     type: textMessageInfo.type,
     sentTime: textMessageInfo.timestamp,
 
