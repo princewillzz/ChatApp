@@ -104,6 +104,7 @@ const CustomBottonFloatingSyncButton = ({
       user_image: apiResponseUserInfo?.image,
       unseen_msg_count: 0,
       last_updated: new Date(1),
+      rsa_public_key: apiResponseUserInfo?.publicRSAKey
     };
     saveRecentChatUserToDB(friendsUserInfo)
       .then(() => {})

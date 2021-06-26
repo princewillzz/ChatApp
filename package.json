@@ -23,8 +23,10 @@
     "react-native-gesture-handler": "^1.10.3",
     "react-native-image-zoom-viewer": "^3.0.1",
     "react-native-reanimated": "^2.2.0",
+    "react-native-rsa-native": "^2.0.3",
     "react-native-safe-area-context": "^3.2.0",
     "react-native-screens": "^3.3.0",
+    "react-native-secure-storage": "^0.1.2",
     "react-native-toast-message": "^1.4.9",
     "react-native-vector-icons": "^8.1.0",
     "realm": "^10.4.1"

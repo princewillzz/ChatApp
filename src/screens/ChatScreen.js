@@ -112,8 +112,8 @@ export default function ChatScreen({route, navigation}) {
       .catch(e => console.log(e));
 
     // sendTextMessageToFriend(textChat);
-
-    sendTextMessageToUser(textChat).catch(e => {
+ 
+    sendTextMessageToUser(textChat, userInfo?.rsa_public_key).catch(e => {
       console.log(e);
     });
 

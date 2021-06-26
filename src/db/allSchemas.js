@@ -17,6 +17,7 @@ export const RecentChatUsersSchema = {
   primaryKey: 'user_id',
   properties: {
     user_id: 'string',
+    rsa_public_key: 'string?',
     displayName: 'string',
     username: 'string',
     user_image: 'string?',

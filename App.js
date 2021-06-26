@@ -21,6 +21,7 @@ import {
 } from './src/db/UsersDB';
 import jwtDecode from 'jwt-decode';
 import HomeScreenDrawerNavigation from './src/screens/HomeScreenDrawerNavigation';
+import { generateRsaKeys } from './src/security/RSAEncryptionService';
 
 const Stack = createStackNavigator();
 
@@ -71,7 +72,7 @@ export default function App() {
           .then(user => {
             if (user?.length > 0) {
               userToken = user[0].token_id;
-              console.log('UserToken', userToken);
+              // console.log('UserToken', userToken);
               handleCurrentUserInit(userToken);
 
               dispatch({type: 'RESTORE_TOKEN', token: userToken});
@@ -130,6 +131,8 @@ export default function App() {
           .catch(e => console.log(e));
       },
       signUp: async userInfo => {
+        const rsa_keys = await generateRsaKeys(userInfo.username)
+        userInfo.publicRSAKey = rsa_keys.public
         return registerUser(userInfo).then(responseData => {
           insertUserSignedIn({
             token_id: responseData.id_token,
