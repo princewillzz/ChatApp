@@ -17,7 +17,11 @@ import {
   removeAllRecentChats,
   updateLastMessageAndCount,
 } from '../db/recent_chat_users';
-import { decryptTestMessage, initiateRSAKeysInitialization, test_rsa } from '../security/RSAEncryptionService';
+import {
+  decryptTestMessage,
+  initiateRSAKeysInitialization,
+  test_rsa,
+} from '../security/RSAEncryptionService';
 
 export default function HomeScreen({navigation}) {
   const {currentUserInfo, signOut} = React.useContext(AuthContext);
@@ -106,9 +110,9 @@ export default function HomeScreen({navigation}) {
   const handleOnMessageWebsocketMessageReceived = useCallback(async e => {
     const messageReceived = JSON.parse(e.data);
     // console.log(typeof messageReceived, messageReceived.sentBy);
-    
-    try{
-      const decodedMsg = await decryptTestMessage(messageReceived.message)
+
+    try {
+      const decodedMsg = await decryptTestMessage(messageReceived.message);
 
       const chatMessage = {
         uid: messageReceived.id,
@@ -130,10 +134,9 @@ export default function HomeScreen({navigation}) {
             .catch(e => console.log(e));
         })
         .catch(e => console.log(e));
-    }catch(e ) {
+    } catch (e) {
       console.log(e);
     }
-
   }, []);
 
   // on Error out of the websocket
@@ -142,13 +145,12 @@ export default function HomeScreen({navigation}) {
     console.log('Connecting again...');
 
     if (e?.message?.includes('401 Unauthorized')) {
-      signOut()
+      signOut();
     } else {
       setTimeout(() => {
         initiateWebsocketConnection();
-      }, 2000)
+      }, 2000);
     }
-
   }, []);
 
   // Disconnect the websocket
@@ -157,9 +159,8 @@ export default function HomeScreen({navigation}) {
   }, []);
 
   // On websocket gets disconnected
-  const handleOnMessageWebsocketClose = useCallback(async (e) => {
+  const handleOnMessageWebsocketClose = useCallback(async e => {
     console.log('Disconnected', e);
-
   }, []);
 
   const loadRecentChatUserFromTheDataStore = async callback => {
@@ -183,7 +184,7 @@ export default function HomeScreen({navigation}) {
     });
 
     // test_rsa(currentUserInfo.username).catch(e => console.log(e))
-    initiateRSAKeysInitialization(currentUserInfo.username)
+    initiateRSAKeysInitialization(currentUserInfo.username);
 
     // removeAllRecentChats().catch(e => {})
     return () => {
