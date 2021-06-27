@@ -5,7 +5,7 @@ import {Icon} from 'react-native-elements';
 export default function ChatScreenHeaderRight() {
   return (
     <View style={styles.container}>
-      <TouchableOpacity>
+      <TouchableOpacity onPress={() => alert('Comming soon!')}>
         <Icon
           size={26}
           style={styles.videoIcon}
@@ -13,7 +13,7 @@ export default function ChatScreenHeaderRight() {
           type="ionicon"
         />
       </TouchableOpacity>
-      <TouchableOpacity>
+      <TouchableOpacity onPress={() => alert('Comming soon!')}>
         <Icon
           style={styles.moreIcon}
           name="ellipsis-vertical-outline"

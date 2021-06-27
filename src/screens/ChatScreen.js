@@ -8,10 +8,7 @@ import {
   View,
 } from 'react-native';
 import {Header, Icon} from 'react-native-elements';
-import {
-  sendTextMessageToFriend,
-  sendTextMessageToUser,
-} from '../api/message-api';
+import {sendTextMessageToUser} from '../api/message-api';
 import AuthContext from '../auth/auth';
 import ChatBox from '../components/ChatBox';
 import ChatScreenHeaderLeft from '../components/ChatScreenHeaderLeft';
@@ -19,7 +16,6 @@ import ChatScreenHeaderRight from '../components/ChatScreenHeaderRight';
 import ImageModal from '../components/ImageModal';
 import {
   chatSchemaRealmObject,
-  deleteAllChats,
   fethAllChatsSortedByDateForUser,
   insertChats,
 } from '../db/chatsSchema';
@@ -112,7 +108,7 @@ export default function ChatScreen({route, navigation}) {
       .catch(e => console.log(e));
 
     // sendTextMessageToFriend(textChat);
- 
+
     sendTextMessageToUser(textChat, userInfo?.rsa_public_key).catch(e => {
       console.log(e);
     });

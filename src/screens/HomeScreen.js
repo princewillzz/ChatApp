@@ -14,13 +14,11 @@ import {insertChats} from '../db/chatsSchema';
 import {
   fetchAllRecentChatUsers,
   recentChatsSchemaRealmObject,
-  removeAllRecentChats,
   updateLastMessageAndCount,
 } from '../db/recent_chat_users';
 import {
   decryptTestMessage,
   initiateRSAKeysInitialization,
-  test_rsa,
 } from '../security/RSAEncryptionService';
 
 export default function HomeScreen({navigation}) {

@@ -2,7 +2,6 @@ import React, {useEffect, useState} from 'react';
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
-  StatusBar,
   StyleSheet,
   View,
 } from 'react-native';

@@ -1,9 +1,7 @@
-import moment from 'moment';
 import React from 'react';
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
-  StatusBar,
   StyleSheet,
   View,
 } from 'react-native';

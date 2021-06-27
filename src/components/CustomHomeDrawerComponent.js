@@ -4,9 +4,8 @@ import {
   DrawerItemList,
 } from '@react-navigation/drawer';
 import React, {useContext} from 'react';
-import {View, Text, StyleSheet} from 'react-native';
+import {StyleSheet, View} from 'react-native';
 import {Icon} from 'react-native-elements/dist/icons/Icon';
-import Animated from 'react-native-reanimated';
 import AuthContext from '../auth/auth';
 
 const CustomHomeDrawerComponent = props => {

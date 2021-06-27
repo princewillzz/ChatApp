@@ -1,9 +1,6 @@
 import React from 'react';
-import {View} from 'react-native';
-import {Text} from 'react-native';
-import {StyleSheet, TouchableOpacity} from 'react-native';
-import {Avatar, ListItem, Badge} from 'react-native-elements';
-import {Button} from 'react-native-elements';
+import {StyleSheet, TouchableOpacity, View} from 'react-native';
+import {Avatar, Badge, Button, ListItem} from 'react-native-elements';
 import {Swipeable} from 'react-native-gesture-handler';
 
 export default React.memo(

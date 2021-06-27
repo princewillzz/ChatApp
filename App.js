@@ -1,32 +1,22 @@
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
+import jwtDecode from 'jwt-decode';
 import React from 'react';
 import Toast from 'react-native-toast-message';
 import {signinUser} from './src/api/auth-api';
 import {registerUser} from './src/api/users-api';
 import AuthContext from './src/auth/auth';
-import ChatScreen from './src/screens/ChatScreen';
-import HomeScreen from './src/screens/HomeScreen';
-import RegisterScreen from './src/screens/RegisterScreen';
-import SignInScreen from './src/screens/SignInScreen';
-
-import {UsersSchema, USERS_SCHEMA} from './src/db/allSchemas';
-
 import {
-  deleteAllUsers,
   deleteUserByToken,
-  fetchAllUsers,
-  fetchUserById,
   getActiveUser,
   insertUserSignedIn,
 } from './src/db/UsersDB';
-import jwtDecode from 'jwt-decode';
+import ChatScreen from './src/screens/ChatScreen';
 import HomeScreenDrawerNavigation from './src/screens/HomeScreenDrawerNavigation';
+import RegisterScreen from './src/screens/RegisterScreen';
+import SignInScreen from './src/screens/SignInScreen';
 import {generateRsaKeys} from './src/security/RSAEncryptionService';
-import useProfilePictureFromDB from './src/custom-hooks/useProfilePictureFromDB';
-import {baseURL} from './config';
 import {constructProfilePhotoURIWithImageId} from './src/services/utility-service';
-import {removeAllRecentChats} from './src/db/recent_chat_users';
 
 const Stack = createStackNavigator();
 

@@ -1,9 +1,8 @@
-import React from 'react';
-import {View, Text} from 'react-native';
 import {createDrawerNavigator} from '@react-navigation/drawer';
-import HomeScreen from './HomeScreen';
-import CustomHomeDrawerComponent from '../components/CustomHomeDrawerComponent';
+import React from 'react';
 import {Icon} from 'react-native-elements';
+import CustomHomeDrawerComponent from '../components/CustomHomeDrawerComponent';
+import HomeScreen from './HomeScreen';
 import SettingsScreen from './SettingsScreen';
 
 const Drawer = createDrawerNavigator();
