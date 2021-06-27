@@ -4,7 +4,7 @@ import {UsersSchema, USERS_SCHEMA} from './allSchemas';
 const UserdatabaseOptions = {
   path: 'untangledchat.users.realm',
   schema: [UsersSchema],
-  schemaVersion: 1,
+  schemaVersion: 2,
 };
 
 export const insertUserSignedIn = userDetails =>
@@ -15,6 +15,18 @@ export const insertUserSignedIn = userDetails =>
           realm.create(USERS_SCHEMA, userDetails);
           resolve();
         });
+      })
+      .catch(error => reject(error));
+  });
+
+export const fetchUserById = token_id =>
+  new Promise((resolve, reject) => {
+    Realm.open(UserdatabaseOptions)
+      .then(realm => {
+        // console.log('Token: ', token_id);
+        const user = realm.objectForPrimaryKey(USERS_SCHEMA, token_id);
+        console.log(user);
+        resolve(user);
       })
       .catch(error => reject(error));
   });
@@ -61,4 +73,22 @@ export const getActiveUser = () =>
         resolve(users.filtered('status == "active"'));
       })
       .catch(error => reject(error));
+  });
+
+export const updateProfilePictureOfUser = (token_id, imageId) =>
+  new Promise((resolve, reject) => {
+    Realm.open(UserdatabaseOptions)
+      .then(realm => {
+        const user = realm.objectForPrimaryKey(USERS_SCHEMA, token_id);
+        console.log(user);
+        if (user) {
+          realm.write(() => {
+            user.imageId = imageId;
+            resolve();
+          });
+        } else {
+          resolve();
+        }
+      })
+      .catch(e => reject(e));
   });

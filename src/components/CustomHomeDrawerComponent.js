@@ -25,14 +25,14 @@ const CustomHomeDrawerComponent = props => {
           )}
           onPress={signOut}
         />
-        <DrawerItem
+        {/* <DrawerItem
           style={styles.eachItem}
           label={''}
           icon={({color, size}) => (
             <Icon name="settings-outline" type="ionicon" size={32} />
           )}
           onPress={() => alert('comming soon')}
-        />
+        /> */}
         <DrawerItemList {...props} itemStyle={styles.eachItem} />
       </DrawerContentScrollView>
     </View>

@@ -16,12 +16,17 @@ import {
   deleteAllUsers,
   deleteUserByToken,
   fetchAllUsers,
+  fetchUserById,
   getActiveUser,
   insertUserSignedIn,
 } from './src/db/UsersDB';
 import jwtDecode from 'jwt-decode';
 import HomeScreenDrawerNavigation from './src/screens/HomeScreenDrawerNavigation';
-import { generateRsaKeys } from './src/security/RSAEncryptionService';
+import {generateRsaKeys} from './src/security/RSAEncryptionService';
+import useProfilePictureFromDB from './src/custom-hooks/useProfilePictureFromDB';
+import {baseURL} from './config';
+import {constructProfilePhotoURIWithImageId} from './src/services/utility-service';
+import {removeAllRecentChats} from './src/db/recent_chat_users';
 
 const Stack = createStackNavigator();
 
@@ -100,11 +105,37 @@ export default function App() {
   const handleCurrentUserInit = token => {
     const decodedToken = jwtDecode(token);
 
+    let profile_img_uri = null;
+    if (decodedToken?.profile_image) {
+      profile_img_uri = constructProfilePhotoURIWithImageId(
+        decodedToken.profile_image,
+      );
+    }
+
     const currentUserInfo = {
       username: decodedToken.sub,
       token_id: token,
-      image: 'https://picsum.photos/200/300',
+      image: profile_img_uri,
     };
+
+    try {
+      console.log(decodedToken);
+      // fetchUserById(currentUserInfo.token_id)
+      //   .then(user => {
+      //     let imageURI = null;
+
+      //     if (user?.imageId) {
+      //       imageURI = constructProfilePhotoURIWithImageId(user.imageId);
+      //       setCurrentUserInfo({...currentUserInfo, image: imageURI});
+      //     }
+      //   })
+      //   .catch(e => {
+      //     console.log(e);
+      //   });
+    } catch (error) {
+      console.log(error);
+    }
+
     setCurrentUserInfo(currentUserInfo);
   };
 
@@ -131,8 +162,8 @@ export default function App() {
           .catch(e => console.log(e));
       },
       signUp: async userInfo => {
-        const rsa_keys = await generateRsaKeys(userInfo.username)
-        userInfo.publicRSAKey = rsa_keys.public
+        const rsa_keys = await generateRsaKeys(userInfo.username);
+        userInfo.publicRSAKey = rsa_keys.public;
         return registerUser(userInfo).then(responseData => {
           insertUserSignedIn({
             token_id: responseData.id_token,
@@ -149,6 +180,8 @@ export default function App() {
         });
       },
       currentUserInfo: currentUserInfo,
+      updateCurrentUserImage: image =>
+        setCurrentUserInfo({...currentUserInfo, image: image}),
     }),
     [currentUserInfo],
   );

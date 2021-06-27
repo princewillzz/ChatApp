@@ -45,3 +45,20 @@ export const checkIfUsernameExistsAndFetchUsersInfo = async (
       return data;
     });
 };
+
+export const uploadUserProfilePhoto = async (image, myAuthToken) => {
+  const formDate = new FormData();
+  formDate.append('profile_img', image);
+
+  const URI = `${baseURL}/api/secured/users/profile-photo`;
+  return fetch(URI, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'multipart/form-data',
+      Authorization: `Bearer ${myAuthToken}`,
+    },
+    body: formDate,
+  }).then(data => {
+    return data;
+  });
+};

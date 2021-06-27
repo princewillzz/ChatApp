@@ -9,6 +9,7 @@ export const UsersSchema = {
     token_id: 'string',
     loggedAt: 'string',
     status: 'string',
+    imageId: 'string?',
   },
 };
 
