@@ -60,8 +60,10 @@ export const updateLastMessageAndCount = (
             recentChatUser[0].last_unseen_msg = message;
 
             // console.log(recentChatUser[0].user_id, activeChatingWithFriendId);
-            if (activeChatingWithFriendId !== recentChatUser[0].user_id)
+            if (activeChatingWithFriendId !== recentChatUser[0].user_id) {
               recentChatUser[0].unseen_msg_count += 1;
+              // console.log(recentChatUser[0].unseen_msg_count);
+            }
           }
 
           // console.log('last message', message);

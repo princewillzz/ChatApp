@@ -113,7 +113,7 @@ export default function HomeScreen({navigation}) {
       const decodedMsg = await decryptTestMessage(messageReceived.message);
 
       const chatMessage = {
-        uid: messageReceived.id,
+        uid: messageReceived.id + Math.random().toString(),
         textMessage: decodedMsg,
         timestamp: new Date(),
         isMe: false,

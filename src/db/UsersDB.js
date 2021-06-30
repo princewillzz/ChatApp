@@ -4,7 +4,7 @@ import {UsersSchema, USERS_SCHEMA} from './allSchemas';
 const UserdatabaseOptions = {
   path: 'untangledchat.users.realm',
   schema: [UsersSchema],
-  schemaVersion: 2,
+  schemaVersion: 5000,
 };
 
 export const insertUserSignedIn = userDetails =>

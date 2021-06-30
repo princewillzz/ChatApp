@@ -10,7 +10,11 @@ export default React.memo(
     handleOpenImageModal,
     userInfo,
   }) => {
-    // console.log(userInfo);
+    // console.log(
+    //   userInfo.unseen_msg_count,
+    //   userInfo.last_unseen_msg,
+    //   'recent chat',
+    // );
     return (
       <Swipeable
         friction={2}
@@ -25,38 +29,43 @@ export default React.memo(
               userInfo: JSON.stringify(userInfo),
             });
           }}>
-          <TouchableOpacity
-            onPress={() =>
-              userInfo.user_image && handleOpenImageModal(userInfo?.user_image)
-            }>
+          <View>
             {userInfo?.user_image ? (
-              <Avatar
-                rounded
-                source={{
-                  uri: userInfo?.user_image,
-                }}
-                containerStyle={{backgroundColor: 'silver'}}
-                title={userInfo?.displayName && userInfo?.displayName[0]}
-                icon={{name: 'person-outline', type: 'ionicon'}}
-              />
+              <TouchableOpacity
+                onPress={() =>
+                  userInfo.user_image &&
+                  handleOpenImageModal(userInfo?.user_image)
+                }>
+                <Avatar
+                  rounded
+                  source={{
+                    uri: userInfo?.user_image,
+                  }}
+                  containerStyle={{backgroundColor: 'silver'}}
+                  title={userInfo?.displayName && userInfo?.displayName[0]}
+                  icon={{name: 'person-outline', type: 'ionicon'}}
+                />
+              </TouchableOpacity>
             ) : (
-              <View>
+              <TouchableOpacity>
                 <Avatar
                   rounded
                   containerStyle={{backgroundColor: 'silver'}}
                   title={userInfo?.displayName && userInfo?.displayName[0]}
                   icon={{name: 'person-outline', type: 'ionicon'}}
                 />
-                <Badge
-                  value={
-                    userInfo?.unseen_msg_count > 0 && userInfo?.unseen_msg_count
-                  }
-                  status={userInfo?.unseen_msg_count > 0 && 'error'}
-                  containerStyle={{position: 'absolute', top: -4, right: -4}}
-                />
-              </View>
+              </TouchableOpacity>
             )}
-          </TouchableOpacity>
+
+            <Badge
+              value={
+                userInfo?.unseen_msg_count > 0 && userInfo?.unseen_msg_count
+              }
+              status={userInfo?.unseen_msg_count > 0 && 'error'}
+              containerStyle={{position: 'absolute', top: -4, right: -4}}
+            />
+          </View>
+
           <ListItem.Content>
             <ListItem.Title>{userInfo?.displayName}</ListItem.Title>
             <ListItem.Subtitle>
