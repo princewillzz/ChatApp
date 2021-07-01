@@ -5,11 +5,17 @@ import {
 } from '@react-navigation/drawer';
 import React, {useContext} from 'react';
 import {StyleSheet, View} from 'react-native';
-import {Icon} from 'react-native-elements/dist/icons/Icon';
+import {Avatar} from 'react-native-elements/dist';
+import {Icon} from 'react-native-elements';
 import AuthContext from '../auth/auth';
 
 const CustomHomeDrawerComponent = props => {
   const {signOut} = useContext(AuthContext);
+
+  const navigateToChatScreenWithChatBot = () => {
+    console.log('Navigating');
+    props.navigation.push('ChatBot');
+  };
 
   return (
     <View style={styles.container}>
@@ -24,15 +30,23 @@ const CustomHomeDrawerComponent = props => {
           )}
           onPress={signOut}
         />
-        {/* <DrawerItem
-          style={styles.eachItem}
+        <DrawerItemList {...props} itemStyle={styles.eachItem} />
+        {/* Chat bot */}
+        <DrawerItem
+          style={[styles.eachItem, styles.chatbotContainer]}
           label={''}
           icon={({color, size}) => (
-            <Icon name="settings-outline" type="ionicon" size={32} />
+            // <Icon name="body" type="ionicon" size={32} />
+            <Avatar
+              rounded
+              source={require('../assets/images/buddy3.png')}
+              // containerStyle={{backgroundColor: 'silver'}}
+              icon={{name: 'person-outline', type: 'ionicon'}}
+              size={50}
+            />
           )}
-          onPress={() => alert('comming soon')}
-        /> */}
-        <DrawerItemList {...props} itemStyle={styles.eachItem} />
+          onPress={navigateToChatScreenWithChatBot}
+        />
       </DrawerContentScrollView>
     </View>
   );
@@ -41,8 +55,7 @@ const CustomHomeDrawerComponent = props => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // justifyContent: 'center',
-    alignItems: 'center',
+    // backgroundColor: 'red',
   },
   drawerContainer: {
     flex: 1,
@@ -50,12 +63,11 @@ const styles = StyleSheet.create({
     // backgroundColor: 'black',
   },
   eachItem: {
-    // backgroundColor: 'red',
-    // flex: 1,
-    // flexDirection: 'row',
-    alignSelf: 'center',
-    width: '100%',
-    alignItems: 'center',
+    alignItems: 'flex-start',
+  },
+  chatbotContainer: {
+    height: 70,
+    justifyContent: 'center',
   },
 });
 

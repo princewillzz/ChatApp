@@ -11,6 +11,7 @@ import {
   getActiveUser,
   insertUserSignedIn,
 } from './src/db/UsersDB';
+import ChatBotTalkScreen from './src/screens/ChatBotTalkScreen';
 import ChatScreen from './src/screens/ChatScreen';
 import HomeScreenDrawerNavigation from './src/screens/HomeScreenDrawerNavigation';
 import RegisterScreen from './src/screens/RegisterScreen';
@@ -217,6 +218,13 @@ export default function App() {
               <Stack.Screen
                 name="Chat"
                 component={ChatScreen}
+                options={{
+                  headerShown: false,
+                }}
+              />
+              <Stack.Screen
+                name="ChatBot"
+                component={ChatBotTalkScreen}
                 options={{
                   headerShown: false,
                 }}
