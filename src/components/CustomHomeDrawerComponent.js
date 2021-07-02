@@ -13,7 +13,6 @@ const CustomHomeDrawerComponent = props => {
   const {signOut} = useContext(AuthContext);
 
   const navigateToChatScreenWithChatBot = () => {
-    console.log('Navigating');
     props.navigation.push('ChatBot');
   };
 

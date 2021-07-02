@@ -63,7 +63,6 @@ export default function ChatBotTalkScreen({route, navigation}) {
   };
 
   useEffect(() => {
-    console.log(meUserInfo);
     setChats([
       {
         uid: Math.random().toString(),

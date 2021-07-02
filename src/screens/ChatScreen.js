@@ -23,6 +23,7 @@ import {
   resetUnSeenMessageCount,
   updateLastMessageAndCount,
 } from '../db/recent_chat_users';
+import {EnumMessageType} from '../utils/EnumMessageType';
 
 export default function ChatScreen({route, navigation}) {
   const {currentUserInfo: meUserInfo} = React.useContext(AuthContext);
@@ -93,7 +94,7 @@ export default function ChatScreen({route, navigation}) {
       textMessage: textMessageToBeSent.trim(),
       timestamp: new Date(),
       isMe: true,
-      type: 'text',
+      type: EnumMessageType.TEXT,
       send_to_id: userInfo?.username,
     };
 

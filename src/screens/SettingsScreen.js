@@ -116,7 +116,7 @@ const SettingsScreen = ({navigation}) => {
           <Icon name="call-outline" type="ionicon" />
           <ListItem.Content>
             <ListItem.Subtitle>Phone</ListItem.Subtitle>
-            <ListItem.Title>8918930270</ListItem.Title>
+            <ListItem.Title>{currentUserInfo.username}</ListItem.Title>
           </ListItem.Content>
         </ListItem>
         <ListItem containerStyle={styles.listItem} bottomDivider>
