@@ -2,10 +2,12 @@ import React from 'react';
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
+  StatusBar,
   StyleSheet,
   View,
 } from 'react-native';
 import {Button, Icon, Input} from 'react-native-elements';
+import PhoneInput from 'react-native-phone-number-input';
 import Toast from 'react-native-toast-message';
 import AuthContext from '../auth/auth';
 
@@ -21,12 +23,13 @@ export default function SignInScreen({navigation}) {
 
   const {signIn} = React.useContext(AuthContext);
 
-  const usernameInput = React.createRef();
+  // const usernameInput = React.createRef();
   const passwordInput = React.createRef();
+  const usernamePhoneInput = React.useRef(null);
 
   const handleSignIn = async () => {
-    if (!username) {
-      usernameInput.current.shake();
+    if (!usernamePhoneInput.current?.isValidNumber(username)) {
+      console.log('Invalid nu');
       return;
     }
     if (!password) {
@@ -35,7 +38,14 @@ export default function SignInScreen({navigation}) {
     }
 
     setLoading(true);
-    signIn({username, password}).catch(e => {
+
+    // TODO remove later on
+    const tempUsername = username.replace(
+      `+${usernamePhoneInput.current?.getCallingCode()}`,
+      '',
+    );
+    console.log(tempUsername);
+    signIn({username: tempUsername, password}).catch(e => {
       setLoading(false);
       Toast.show({
         type: 'error',
@@ -49,15 +59,7 @@ export default function SignInScreen({navigation}) {
 
   return (
     <>
-      {/* <StatusBar barStyle="light-content" backgroundColor="dodgerblue" /> */}
-      {/* <Header
-				backgroundColor="silver"
-				centerComponent={{
-					text: "Login",
-					style: { color: "black", fontSize: 20 },
-				}}
-			/> */}
-
+      <StatusBar barStyle="light-content" backgroundColor="dodgerblue" />
       {isLoading && (
         <View style={[styles.loadingContainer]}>
           <ActivityIndicator size="large" color="#3178D2" />
@@ -65,35 +67,36 @@ export default function SignInScreen({navigation}) {
       )}
       <View style={styles.container}>
         <KeyboardAvoidingView style={styles.formContainer}>
-          <Input
-            placeholder="username"
-            value={username}
-            onChangeText={setUsername}
-            containerStyle={{
-              alignContent: 'center',
-              width: '70%',
+          <PhoneInput
+            ref={usernamePhoneInput}
+            defaultValue={username}
+            defaultCode={'IN'}
+            onChangeFormattedText={setUsername}
+            autoFocus
+            containerStyle={styles.usernamePhoneInputContainer}
+            textContainerStyle={{
+              borderWidth: 1,
+              borderRadius: 5,
+              borderColor: usernamePhoneInput.current?.isValidNumber(username)
+                ? 'white'
+                : 'red',
             }}
-            leftIcon={
-              <Icon
-                name="person-circle-outline"
-                size={22}
-                color="black"
-                type="ionicon"
-              />
-            }
-            ref={usernameInput}
+            textInputStyle={{
+              minHeight: 60,
+            }}
+            withShadow
           />
+
           <Input
             placeholder="password"
             value={password}
             onChangeText={setPassword}
             secureTextEntry
-            containerStyle={{
-              alignContent: 'center',
-              width: '70%',
-            }}
+            containerStyle={styles.passwordInputContainer}
+            inputContainerStyle={styles.passwordInputInputContainer}
             leftIcon={<Icon name="lock" size={20} color="black" />}
             ref={passwordInput}
+            errorStyle={{display: 'none'}}
           />
 
           <Button
@@ -104,20 +107,18 @@ export default function SignInScreen({navigation}) {
               backgroundColor: 'dodgerblue',
             }}
             titleStyle={{
-              width: '50%',
               textAlign: 'center',
             }}
+            containerStyle={styles.buttonContainer}
           />
           <Button
             onPress={() => navigation.push('Register')}
             title="Register"
             titleStyle={{
-              width: '50%',
+              // width: '50%',
               textAlign: 'center',
             }}
-            containerStyle={{
-              marginVertical: 10,
-            }}
+            containerStyle={styles.buttonContainer}
             buttonStyle={{
               borderWidth: 0.9,
               borderColor: 'dodgerblue',
@@ -129,6 +130,9 @@ export default function SignInScreen({navigation}) {
     </>
   );
 }
+
+const widthOfEachInputBox = '75%';
+const widthOfSigninRegisterBtn = '73%';
 
 const styles = StyleSheet.create({
   // screenContainer: {
@@ -147,6 +151,31 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  usernamePhoneInputContainer: {
+    alignContent: 'center',
+    width: widthOfEachInputBox,
+    height: 60,
+    borderRadius: 10,
+    marginBottom: 10,
+  },
+  passwordInputContainer: {
+    backgroundColor: '#fff',
+    alignContent: 'center',
+    width: widthOfEachInputBox,
+    borderRadius: 10,
+    marginBottom: 20,
+    elevation: 1,
+  },
+  passwordInputInputContainer: {
+    // backgroundColor: 'red',
+    height: 60,
+    paddingHorizontal: 7,
+    borderBottomWidth: 0,
+  },
+  buttonContainer: {
+    width: widthOfSigninRegisterBtn,
+    marginBottom: 10,
   },
   loadingContainer: {
     position: 'absolute',
