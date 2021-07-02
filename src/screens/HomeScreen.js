@@ -14,14 +14,13 @@ import {insertChats} from '../db/chatsSchema';
 import {
   fetchAllRecentChatUsers,
   recentChatsSchemaRealmObject,
-  removeAllRecentChats,
   updateLastMessageAndCount,
 } from '../db/recent_chat_users';
 import {
   decryptTestMessage,
   initiateRSAKeysInitialization,
-  test_rsa,
 } from '../security/RSAEncryptionService';
+import {EnumMessageType} from '../utils/EnumMessageType';
 
 export default function HomeScreen({navigation}) {
   const {currentUserInfo, signOut} = React.useContext(AuthContext);
@@ -112,26 +111,30 @@ export default function HomeScreen({navigation}) {
     // console.log(typeof messageReceived, messageReceived.sentBy);
 
     try {
-      const decodedMsg = await decryptTestMessage(messageReceived.message);
+      let decodedMsg = null;
+      if (messageReceived.type === EnumMessageType.TEXT)
+        decodedMsg = await decryptTestMessage(messageReceived.message);
+      else throw new Error('Unacceptable Message Type');
 
       const chatMessage = {
-        uid: messageReceived.id,
+        uid: messageReceived.id + Math.random().toString(),
         textMessage: decodedMsg,
         timestamp: new Date(),
         isMe: false,
-        type: 'text',
+        type: messageReceived.type,
         send_to_id: messageReceived.sentBy,
       };
 
       // console.log(chatMessage.textMessage);
       insertChats(chatMessage)
         .then(() => {
-          updateLastMessageAndCount(
-            chatMessage.send_to_id,
-            chatMessage.textMessage,
-            activeChatingWithFriendId.current,
-          ) // .then(() => console.log('message: ', chatMessage.textMessage))
-            .catch(e => console.log(e));
+          if (messageReceived.type === EnumMessageType.TEXT)
+            updateLastMessageAndCount(
+              chatMessage.send_to_id,
+              chatMessage.textMessage,
+              activeChatingWithFriendId.current,
+            ) // .then(() => console.log('message: ', chatMessage.textMessage))
+              .catch(e => console.log(e));
         })
         .catch(e => console.log(e));
     } catch (e) {

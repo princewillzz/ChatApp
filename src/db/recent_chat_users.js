@@ -60,8 +60,10 @@ export const updateLastMessageAndCount = (
             recentChatUser[0].last_unseen_msg = message;
 
             // console.log(recentChatUser[0].user_id, activeChatingWithFriendId);
-            if (activeChatingWithFriendId !== recentChatUser[0].user_id)
+            if (activeChatingWithFriendId !== recentChatUser[0].user_id) {
               recentChatUser[0].unseen_msg_count += 1;
+              // console.log(recentChatUser[0].unseen_msg_count);
+            }
           }
 
           // console.log('last message', message);
@@ -93,6 +95,29 @@ export const resetUnSeenMessageCount = user_id =>
         }
       })
       .catch(e => reject(e));
+  });
+
+export const updateRecentChatUserInfo = friendsUserInfo =>
+  new Promise((resolve, reject) => {
+    Realm.open(RecentChatUserdatabaseOptions)
+      .then(realm => {
+        realm.write(() => {
+          let recentChatUser = realm
+            .objects(RECENT_CHAT_USERS_SCHEMA)
+            .filtered(`username == "${friendsUserInfo.username}"`);
+          if (recentChatUser.length > 0) {
+            recentChatUser[0].username = friendsUserInfo.username;
+            recentChatUser[0].displayName = friendsUserInfo.displayName;
+            recentChatUser[0].user_image = friendsUserInfo.user_image;
+            recentChatUser[0].last_updated = friendsUserInfo.last_updated;
+            recentChatUser[0].rsa_public_key = friendsUserInfo.rsa_public_key;
+          }
+          resolve();
+        });
+      })
+      .catch(e => {
+        reject(e);
+      });
   });
 
 export const recentChatsSchemaRealmObject = new Realm(

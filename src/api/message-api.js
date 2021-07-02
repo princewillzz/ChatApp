@@ -1,5 +1,6 @@
 import {baseURL} from '../../config';
-import { encryptTextMessage } from '../security/RSAEncryptionService';
+import {encryptTextMessage} from '../security/RSAEncryptionService';
+import {EnumMessageType} from '../utils/EnumMessageType';
 
 let websocket = null;
 
@@ -7,12 +8,20 @@ export const initilizeWebsocketObject = async websocketObject => {
   websocket = websocketObject;
 };
 
-export const sendTextMessageToUser = async (textMessageInfo, rsa_public_key) => {
+export const sendTextMessageToUser = async (
+  textMessageInfo,
+  rsa_public_key,
+) => {
   if (!websocket && !websocket.OPEN)
     throw new Error('Connection not estabilshed');
 
+  if (textMessageInfo.type !== EnumMessageType.TEXT)
+    throw new Error('Not a Text Message');
 
-  const encodedTextMsg = await encryptTextMessage(textMessageInfo.textMessage, rsa_public_key)
+  const encodedTextMsg = await encryptTextMessage(
+    textMessageInfo.textMessage,
+    rsa_public_key,
+  );
 
   const textMessageDetails = {
     message: encodedTextMsg,

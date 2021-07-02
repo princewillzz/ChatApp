@@ -8,10 +8,7 @@ import {
   View,
 } from 'react-native';
 import {Header, Icon} from 'react-native-elements';
-import {
-  sendTextMessageToFriend,
-  sendTextMessageToUser,
-} from '../api/message-api';
+import {sendTextMessageToUser} from '../api/message-api';
 import AuthContext from '../auth/auth';
 import ChatBox from '../components/ChatBox';
 import ChatScreenHeaderLeft from '../components/ChatScreenHeaderLeft';
@@ -19,7 +16,6 @@ import ChatScreenHeaderRight from '../components/ChatScreenHeaderRight';
 import ImageModal from '../components/ImageModal';
 import {
   chatSchemaRealmObject,
-  deleteAllChats,
   fethAllChatsSortedByDateForUser,
   insertChats,
 } from '../db/chatsSchema';
@@ -27,6 +23,7 @@ import {
   resetUnSeenMessageCount,
   updateLastMessageAndCount,
 } from '../db/recent_chat_users';
+import {EnumMessageType} from '../utils/EnumMessageType';
 
 export default function ChatScreen({route, navigation}) {
   const {currentUserInfo: meUserInfo} = React.useContext(AuthContext);
@@ -97,7 +94,7 @@ export default function ChatScreen({route, navigation}) {
       textMessage: textMessageToBeSent.trim(),
       timestamp: new Date(),
       isMe: true,
-      type: 'text',
+      type: EnumMessageType.TEXT,
       send_to_id: userInfo?.username,
     };
 
@@ -112,7 +109,7 @@ export default function ChatScreen({route, navigation}) {
       .catch(e => console.log(e));
 
     // sendTextMessageToFriend(textChat);
- 
+
     sendTextMessageToUser(textChat, userInfo?.rsa_public_key).catch(e => {
       console.log(e);
     });

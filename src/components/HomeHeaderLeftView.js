@@ -6,13 +6,25 @@ export default function HomeHeaderLeftView({handleOpenImageModal, image}) {
   return (
     <>
       <View style={styles.container}>
-        <TouchableOpacity onPress={() => handleOpenImageModal(image)}>
-          <Avatar
-            rounded
-            source={{uri: image}}
-            avatarStyle={styles.avatarStyle}
-          />
-        </TouchableOpacity>
+        {image ? (
+          <TouchableOpacity onPress={() => handleOpenImageModal(image)}>
+            <Avatar
+              rounded
+              source={{uri: image}}
+              icon={{name: 'person-outline', type: 'ionicon', color: 'white'}}
+              containerStyle={{backgroundColor: 'silver'}}
+            />
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity>
+            <Avatar
+              rounded
+              icon={{name: 'person-outline', type: 'ionicon', color: 'white'}}
+              containerStyle={{backgroundColor: 'silver'}}
+            />
+          </TouchableOpacity>
+        )}
+
         <Text style={styles.title}>Chats</Text>
       </View>
     </>
@@ -27,7 +39,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  avatarStyle: {},
   title: {
     marginLeft: 10,
     paddingLeft: 5,

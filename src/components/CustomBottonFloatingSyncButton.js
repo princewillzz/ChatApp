@@ -2,7 +2,11 @@ import React, {useState} from 'react';
 import Contacts from 'react-native-contacts';
 import {Overlay, SpeedDial} from 'react-native-elements';
 import {checkIfUsernameExistsAndFetchUsersInfo} from '../api/users-api';
-import {saveRecentChatUserToDB} from '../db/recent_chat_users';
+import {
+  saveRecentChatUserToDB,
+  updateRecentChatUserInfo,
+} from '../db/recent_chat_users';
+import {constructProfilePhotoURIWithImageId} from '../services/utility-service';
 import CustomSyncInfoModal from './CustomSyncInfoModal';
 
 const CustomBottonFloatingSyncButton = ({
@@ -32,9 +36,9 @@ const CustomBottonFloatingSyncButton = ({
         .filter(
           manipulatedContactInfo =>
             manipulatedContactInfo &&
-            !recentChatUsers.find(
-              user => user.username === manipulatedContactInfo.number,
-            ) &&
+            // !recentChatUsers.find(
+            //   user => user.username === manipulatedContactInfo.number,
+            // ) &&
             currentUserInfo.username !== manipulatedContactInfo.number,
         );
 
@@ -50,7 +54,16 @@ const CustomBottonFloatingSyncButton = ({
           .then(async contactUserInfo => {
             console.log(count);
             try {
-              await saveFriendsInfoToDB(contactUserInfo, eachContact);
+              if (
+                recentChatUsers.find(
+                  user => user.username === contactUserInfo.username,
+                )
+              ) {
+                console.log('Already present');
+                await updateFriendsUserInfo(contactUserInfo, eachContact);
+              } else {
+                await saveFriendsInfoToDB(contactUserInfo, eachContact);
+              }
             } catch (error) {
               console.log('error saving- ', error);
             }
@@ -97,20 +110,53 @@ const CustomBottonFloatingSyncButton = ({
     apiResponseUserInfo,
     usersContactBookInfo,
   ) => {
+    const profile_img_uri = null;
+
+    if (apiResponseUserInfo?.profile_picture) {
+      profile_img_uri = constructProfilePhotoURIWithImageId(
+        apiResponseUserInfo.profile_picture,
+      );
+    }
+
     const friendsUserInfo = {
       user_id: apiResponseUserInfo.id,
       username: apiResponseUserInfo.username,
       displayName: usersContactBookInfo.displayName,
-      user_image: apiResponseUserInfo?.image,
+      user_image: profile_img_uri,
       unseen_msg_count: 0,
+      last_unseen_msg: '',
       last_updated: new Date(1),
-      rsa_public_key: apiResponseUserInfo?.publicRSAKey
+      rsa_public_key: apiResponseUserInfo?.publicRSAKey,
     };
     saveRecentChatUserToDB(friendsUserInfo)
       .then(() => {})
       .catch(e => {
         console.log(e);
       });
+  };
+
+  const updateFriendsUserInfo = async (
+    apiResponseUserInfo,
+    usersContactBookInfo,
+  ) => {
+    let profile_img_uri = null;
+
+    if (apiResponseUserInfo?.profile_picture) {
+      profile_img_uri = constructProfilePhotoURIWithImageId(
+        apiResponseUserInfo.profile_picture,
+      );
+    }
+
+    console.log(profile_img_uri);
+    const updatedFriendsUserInfo = {
+      username: apiResponseUserInfo.username,
+      displayName: usersContactBookInfo.displayName,
+      user_image: profile_img_uri,
+      last_updated: new Date(),
+      rsa_public_key: apiResponseUserInfo?.publicRSAKey,
+    };
+
+    updateRecentChatUserInfo(updatedFriendsUserInfo).catch(e => console.log(e));
   };
 
   // useEffect(() => {

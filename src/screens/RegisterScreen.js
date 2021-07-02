@@ -1,4 +1,5 @@
 import React, {useEffect, useState} from 'react';
+import {Text} from 'react-native';
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -7,11 +8,12 @@ import {
   View,
 } from 'react-native';
 import {Button, Icon, Input} from 'react-native-elements';
+import PhoneInput from 'react-native-phone-number-input';
 import Toast from 'react-native-toast-message';
 import AuthContext from '../auth/auth';
 
 export default function RegisterScreen({navigation}) {
-  const [username, setUsername] = useState('test');
+  const [username, setUsername] = useState('8918930270');
   const [password, setPassword] = useState('pass');
   const [rePassword, setRePassword] = useState('pass');
 
@@ -24,9 +26,10 @@ export default function RegisterScreen({navigation}) {
   const {signUp} = React.useContext(AuthContext);
 
   const [retypePasswordErrorMessage, setRetypePasswordErrorMessage] =
-    useState('');
+    useState(false);
 
   const rePasswordInput = React.createRef();
+  const usernamePhoneInput = React.useRef(null);
 
   const handleRegister = async () => {
     if (!validateFields()) {
@@ -72,34 +75,31 @@ export default function RegisterScreen({navigation}) {
       !rePassword.length > 0
     ) {
       isValid = false;
+    } else if (!usernamePhoneInput?.current?.isValidNumber(username)) {
+      isValid = false;
     }
 
     return isValid;
   };
 
   const handleSetRePassword = rePassword => {
-    let errorMessage = '';
-    if (rePassword && rePassword !== password)
-      errorMessage = 'Password Not Matching';
+    let errorMessage = false;
+    if (rePassword && rePassword !== password) errorMessage = true;
     setRetypePasswordErrorMessage(errorMessage);
     setRePassword(rePassword);
   };
 
+  const handleSetPassword = password => {
+    if (rePassword) {
+      if (rePassword === password) setRetypePasswordErrorMessage(false);
+      else setRetypePasswordErrorMessage(true);
+    }
+    setPassword(password);
+  };
+
   return (
     <>
-      {/* <StatusBar barStyle="light-content" backgroundColor="dodgerblue" /> */}
-      {/* <Header
-				backgroundColor="silver"
-				leftComponent={{
-					icon: "arrow-left",
-					color: "#fff",
-					onPress: () => navigation.pop(),
-				}}
-				centerComponent={{
-					text: "Register",
-					style: { color: "black", fontSize: 20 },
-				}}
-			/> */}
+      <StatusBar barStyle="light-content" backgroundColor="dodgerblue" />
 
       {isLoading && (
         <View style={[styles.loadingContainer]}>
@@ -108,32 +108,34 @@ export default function RegisterScreen({navigation}) {
       )}
       <View style={styles.container}>
         <KeyboardAvoidingView style={styles.formContainer}>
-          <Input
-            placeholder="username"
-            value={username}
-            onChangeText={setUsername}
-            containerStyle={{
-              alignContent: 'center',
-              width: '70%',
+          <PhoneInput
+            ref={usernamePhoneInput}
+            defaultValue={username}
+            defaultCode={'IN'}
+            onChangeFormattedText={setUsername}
+            autoFocus
+            containerStyle={styles.usernamePhoneInputContainer}
+            textContainerStyle={{
+              borderWidth: 1,
+              borderRadius: 5,
+              borderColor: usernamePhoneInput.current?.isValidNumber(username)
+                ? 'white'
+                : 'red',
             }}
-            leftIcon={
-              <Icon
-                name="person-circle-outline"
-                size={22}
-                color="black"
-                type="ionicon"
-              />
-            }
+            textInputStyle={{
+              minHeight: 60,
+            }}
+            withShadow
           />
+
           <Input
             placeholder="password"
             value={password}
-            onChangeText={setPassword}
+            onChangeText={handleSetPassword}
             secureTextEntry
-            containerStyle={{
-              alignContent: 'center',
-              width: '70%',
-            }}
+            containerStyle={styles.passwordInputContainer}
+            inputContainerStyle={styles.passwordInputInputContainer}
+            errorStyle={{display: 'none'}}
             leftIcon={<Icon name="lock" size={20} color="black" />}
           />
 
@@ -142,13 +144,16 @@ export default function RegisterScreen({navigation}) {
             value={rePassword}
             onChangeText={handleSetRePassword}
             secureTextEntry
-            containerStyle={{
-              alignContent: 'center',
-              width: '70%',
-            }}
+            containerStyle={[
+              styles.passwordInputContainer,
+              {
+                borderWidth: 1,
+                borderColor: retypePasswordErrorMessage ? 'red' : '#fff',
+              },
+            ]}
+            inputContainerStyle={styles.passwordInputInputContainer}
+            errorStyle={{display: 'none'}}
             leftIcon={<Icon name="lock" size={20} color="black" />}
-            errorStyle={{color: 'red'}}
-            errorMessage={retypePasswordErrorMessage}
             ref={rePasswordInput}
           />
 
@@ -156,35 +161,29 @@ export default function RegisterScreen({navigation}) {
             title="Register"
             onPress={handleRegister}
             raised
-            titleStyle={{
-              width: '50%',
-              textAlign: 'center',
-            }}
-            containerStyle={{
-              marginVertical: 10,
-            }}
-            buttonStyle={{
-              backgroundColor: 'dodgerblue',
-            }}
+            titleStyle={{textAlign: 'center'}}
+            buttonStyle={{backgroundColor: 'dodgerblue'}}
+            containerStyle={[styles.buttonContainer, {marginTop: 20}]}
           />
           <Button
             onPress={() => navigation.navigate('SignIn')}
             title="Sign in"
-            titleStyle={{
-              width: '50%',
-              textAlign: 'center',
-            }}
+            titleStyle={{textAlign: 'center'}}
             type="outline"
             buttonStyle={{
               borderWidth: 0.9,
               borderColor: 'dodgerblue',
             }}
+            containerStyle={styles.buttonContainer}
           />
         </KeyboardAvoidingView>
       </View>
     </>
   );
 }
+
+const widthOfEachInputBox = '80%';
+const widthOfSigninRegisterBtn = '78%';
 
 const styles = StyleSheet.create({
   container: {
@@ -194,6 +193,31 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  usernamePhoneInputContainer: {
+    alignContent: 'center',
+    width: widthOfEachInputBox,
+    height: 60,
+    borderRadius: 10,
+    marginBottom: 10,
+  },
+  passwordInputContainer: {
+    backgroundColor: '#fff',
+    alignContent: 'center',
+    width: widthOfEachInputBox,
+    borderRadius: 10,
+    marginBottom: 10,
+    elevation: 1,
+  },
+  passwordInputInputContainer: {
+    // backgroundColor: 'red',
+    height: 60,
+    paddingHorizontal: 7,
+    borderBottomWidth: 0,
+  },
+  buttonContainer: {
+    width: widthOfSigninRegisterBtn,
+    marginTop: 10,
   },
   loadingContainer: {
     position: 'absolute',

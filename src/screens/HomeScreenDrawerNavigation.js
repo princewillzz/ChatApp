@@ -1,9 +1,9 @@
-import React from 'react';
-import {View, Text} from 'react-native';
 import {createDrawerNavigator} from '@react-navigation/drawer';
-import HomeScreen from './HomeScreen';
-import CustomHomeDrawerComponent from '../components/CustomHomeDrawerComponent';
+import React from 'react';
 import {Icon} from 'react-native-elements';
+import CustomHomeDrawerComponent from '../components/CustomHomeDrawerComponent';
+import HomeScreen from './HomeScreen';
+import SettingsScreen from './SettingsScreen';
 
 const Drawer = createDrawerNavigator();
 
@@ -17,6 +17,18 @@ const HomeScreenDrawerNavigation = () => {
       drawerStyle={{
         width: 80,
       }}>
+      {/* Settings screen */}
+      <Drawer.Screen
+        name="Settings"
+        component={SettingsScreen}
+        options={{
+          drawerLabel: '',
+          drawerIcon: props => (
+            <Icon name="settings-outline" type="ionicon" size={32} />
+          ),
+        }}
+      />
+      {/* Home Screen */}
       <Drawer.Screen
         name="Home"
         component={HomeScreen}
