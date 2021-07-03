@@ -153,6 +153,7 @@ export default function App() {
           .catch(e => console.log(e));
       },
       signUp: async userInfo => {
+        // ISSUE right here
         const rsa_keys = await generateRsaKeys(userInfo.username);
         userInfo.publicRSAKey = rsa_keys.public;
         return registerUser(userInfo).then(responseData => {

@@ -1,23 +1,28 @@
 import React, {useEffect, useState} from 'react';
-import {Text} from 'react-native';
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
   StatusBar,
   StyleSheet,
+  Text,
+  TouchableOpacity,
   View,
 } from 'react-native';
 import {Button, Icon, Input} from 'react-native-elements';
 import PhoneInput from 'react-native-phone-number-input';
 import Toast from 'react-native-toast-message';
+import {sendOTPToVerifyNumberDuringRegistration} from '../api/auth-api';
 import AuthContext from '../auth/auth';
 
 export default function RegisterScreen({navigation}) {
-  const [username, setUsername] = useState('8918930270');
+  const [username, setUsername] = useState('+918918930270');
   const [password, setPassword] = useState('pass');
   const [rePassword, setRePassword] = useState('pass');
 
   const [isLoading, setLoading] = useState(true);
+
+  const [isVerificationOTPSent, setIsVerificationOTPSent] = useState(false);
+  const [verificationOTP, setVertificationOTP] = useState('');
 
   useEffect(() => {
     setLoading(false);
@@ -31,36 +36,13 @@ export default function RegisterScreen({navigation}) {
   const rePasswordInput = React.createRef();
   const usernamePhoneInput = React.useRef(null);
 
-  const handleRegister = async () => {
-    if (!validateFields()) {
-      Toast.show({
-        type: 'error',
-        position: 'top',
-        text1: 'Please fill form correctly!',
-        visibilityTime: 1000,
-        autoHide: true,
-      });
-      return;
-    }
-    if (rePassword !== password) {
-      rePasswordInput.current.shake();
-      return;
-    }
-
-    setLoading(true);
-    const userInfo = {
-      username,
-      password,
-    };
-    signUp(userInfo).catch(e => {
-      setLoading(false);
-      Toast.show({
-        type: 'error',
-        position: 'top',
-        text1: e.message,
-        visibilityTime: 3000,
-        autoHide: true,
-      });
+  const handleShowToast = msg => {
+    Toast.show({
+      type: 'error',
+      position: 'top',
+      text1: msg,
+      visibilityTime: 1000,
+      autoHide: true,
     });
   };
 
@@ -72,7 +54,8 @@ export default function RegisterScreen({navigation}) {
     } else if (
       !username.length > 0 ||
       !password.length > 0 ||
-      !rePassword.length > 0
+      !rePassword.length > 0 ||
+      !verificationOTP.length > 0
     ) {
       isValid = false;
     } else if (!usernamePhoneInput?.current?.isValidNumber(username)) {
@@ -97,6 +80,51 @@ export default function RegisterScreen({navigation}) {
     setPassword(password);
   };
 
+  const handleSendVerificationOTP = async () => {
+    if (!usernamePhoneInput.current.isValidNumber(username)) {
+      handleShowToast('Mobile Number Invalid!');
+      return;
+    }
+    // Send OTP verification
+    sendOTPToVerifyNumberDuringRegistration({
+      phoneNumber: username,
+    })
+      .then(() => {
+        setIsVerificationOTPSent(true);
+      })
+      .catch(e => {
+        console.log(e);
+      });
+  };
+
+  const handleRegister = async () => {
+    if (!validateFields()) {
+      handleShowToast('Please fill form correctly!');
+      return;
+    }
+    if (rePassword !== password) {
+      rePasswordInput.current.shake();
+      return;
+    }
+
+    setLoading(true);
+    const userInfo = {
+      username,
+      password,
+      verificationOTP,
+    };
+    signUp(userInfo).catch(e => {
+      setLoading(false);
+      Toast.show({
+        type: 'error',
+        position: 'top',
+        text1: e.message,
+        visibilityTime: 3000,
+        autoHide: true,
+      });
+    });
+  };
+
   return (
     <>
       <StatusBar barStyle="light-content" backgroundColor="dodgerblue" />
@@ -112,7 +140,10 @@ export default function RegisterScreen({navigation}) {
             ref={usernamePhoneInput}
             defaultValue={username}
             defaultCode={'IN'}
-            onChangeFormattedText={setUsername}
+            onChangeFormattedText={username => {
+              isVerificationOTPSent && setIsVerificationOTPSent(false);
+              setUsername(username);
+            }}
             autoFocus
             containerStyle={styles.usernamePhoneInputContainer}
             textContainerStyle={{
@@ -136,7 +167,9 @@ export default function RegisterScreen({navigation}) {
             containerStyle={styles.passwordInputContainer}
             inputContainerStyle={styles.passwordInputInputContainer}
             errorStyle={{display: 'none'}}
-            leftIcon={<Icon name="lock" size={20} color="black" />}
+            leftIcon={
+              <Icon name="lock-closed" size={20} type="ionicon" color="black" />
+            }
           />
 
           <Input
@@ -153,18 +186,55 @@ export default function RegisterScreen({navigation}) {
             ]}
             inputContainerStyle={styles.passwordInputInputContainer}
             errorStyle={{display: 'none'}}
-            leftIcon={<Icon name="lock" size={20} color="black" />}
+            leftIcon={
+              <Icon name="lock-closed" size={20} type="ionicon" color="black" />
+            }
             ref={rePasswordInput}
           />
 
-          <Button
-            title="Register"
-            onPress={handleRegister}
-            raised
-            titleStyle={{textAlign: 'center'}}
-            buttonStyle={{backgroundColor: 'dodgerblue'}}
-            containerStyle={[styles.buttonContainer, {marginTop: 20}]}
-          />
+          {isVerificationOTPSent ? (
+            <>
+              <View style={[styles.OTPViewInputContainer]}>
+                <Input
+                  placeholder="OTP"
+                  value={verificationOTP}
+                  onChangeText={setVertificationOTP}
+                  containerStyle={[styles.otpInputContainer, {width: '100%'}]}
+                  inputContainerStyle={styles.otpInputInputContainer}
+                  errorStyle={{display: 'none'}}
+                  leftIcon={
+                    <Icon
+                      name="chatbox-ellipses"
+                      type="ionicon"
+                      size={20}
+                      color="black"
+                    />
+                  }
+                />
+                <TouchableOpacity onPress={handleSendVerificationOTP}>
+                  <Text style={styles.otpResendTextContainer}>Resend OTP</Text>
+                </TouchableOpacity>
+              </View>
+              <Button
+                title="Register"
+                onPress={handleRegister}
+                raised
+                titleStyle={{textAlign: 'center'}}
+                buttonStyle={{backgroundColor: 'dodgerblue'}}
+                containerStyle={[styles.buttonContainer, {marginTop: 20}]}
+              />
+            </>
+          ) : (
+            <Button
+              title="Send OTP"
+              onPress={handleSendVerificationOTP}
+              raised
+              titleStyle={{textAlign: 'center'}}
+              buttonStyle={{backgroundColor: 'red'}}
+              containerStyle={[styles.buttonContainer, {marginTop: 20}]}
+            />
+          )}
+
           <Button
             onPress={() => navigation.navigate('SignIn')}
             title="Sign in"
@@ -215,9 +285,29 @@ const styles = StyleSheet.create({
     paddingHorizontal: 7,
     borderBottomWidth: 0,
   },
+  OTPViewInputContainer: {
+    width: widthOfEachInputBox,
+  },
+  otpInputContainer: {
+    backgroundColor: '#fff',
+    alignContent: 'center',
+    width: widthOfEachInputBox,
+    borderRadius: 10,
+    marginBottom: 10,
+    elevation: 1,
+  },
+  otpInputInputContainer: {
+    height: 60,
+    paddingHorizontal: 7,
+    borderBottomWidth: 0,
+  },
   buttonContainer: {
     width: widthOfSigninRegisterBtn,
     marginTop: 10,
+  },
+  otpResendTextContainer: {
+    color: 'dodgerblue',
+    alignSelf: 'flex-end',
   },
   loadingContainer: {
     position: 'absolute',

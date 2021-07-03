@@ -72,7 +72,6 @@ export default function SignInScreen({navigation}) {
             defaultValue={username}
             defaultCode={'IN'}
             onChangeFormattedText={setUsername}
-            autoFocus
             containerStyle={styles.usernamePhoneInputContainer}
             textContainerStyle={{
               borderWidth: 1,
@@ -94,7 +93,9 @@ export default function SignInScreen({navigation}) {
             secureTextEntry
             containerStyle={styles.passwordInputContainer}
             inputContainerStyle={styles.passwordInputInputContainer}
-            leftIcon={<Icon name="lock" size={20} color="black" />}
+            leftIcon={
+              <Icon name="lock-closed" size={20} type="ionicon" color="black" />
+            }
             ref={passwordInput}
             errorStyle={{display: 'none'}}
           />
