@@ -54,4 +54,20 @@ export const deleteAllChats = () =>
       .catch(error => reject(error));
   });
 
+export const deleteChatForUser = friendUserId =>
+  new Promise((resolve, reject) => {
+    Realm.open(ChatsdatabaseOptions)
+      .then(realm => {
+        realm.write(() => {
+          const chats = realm
+            .objects(CHATS_SCHEMA)
+            .filtered(`send_to_id == "${friendUserId}"`);
+
+          realm.delete(chats);
+          resolve();
+        });
+      })
+      .catch(error => reject(error));
+  });
+
 export const chatSchemaRealmObject = new Realm(ChatsdatabaseOptions);

@@ -66,11 +66,6 @@ export const updateLastMessageAndCount = (
             }
           }
 
-          // console.log('last message', message);
-          // console.log('user msg==> ', recentChatUser.last_unseen_msg);
-
-          // objs[recentChatUser.id].last_unseen_msg = message;
-
           resolve();
         });
       })
@@ -118,6 +113,23 @@ export const updateRecentChatUserInfo = friendsUserInfo =>
       .catch(e => {
         reject(e);
       });
+  });
+
+export const deleteRecentChatUser = username =>
+  new Promise((resolve, reject) => {
+    Realm.open(RecentChatUserdatabaseOptions)
+      .then(realm => {
+        realm.write(() => {
+          let recentChatUser = realm
+            .objects(RECENT_CHAT_USERS_SCHEMA)
+            .filtered(`username == "${username}"`);
+
+          realm.delete(recentChatUser);
+
+          resolve();
+        });
+      })
+      .catch(e => reject(e));
   });
 
 export const recentChatsSchemaRealmObject = new Realm(

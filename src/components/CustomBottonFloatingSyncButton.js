@@ -24,7 +24,7 @@ const CustomBottonFloatingSyncButton = ({
       // read all contacts from the phone contact book
       const contacts = await Contacts.getAll();
       // filter and manipulate contact info that are required
-      const contactsToBeSynced = contacts
+      let contactsToBeSynced = contacts
         .flatMap(eachContact =>
           eachContact.phoneNumbers
             .map(contactNumber => {
@@ -35,6 +35,7 @@ const CustomBottonFloatingSyncButton = ({
             })
             .flatMap(eachContact => generateparsedContacts(eachContact)),
         )
+
         .filter(
           manipulatedContactInfo =>
             manipulatedContactInfo &&
@@ -43,6 +44,12 @@ const CustomBottonFloatingSyncButton = ({
             // ) &&
             currentUserInfo.username !== manipulatedContactInfo.number,
         );
+
+      console.log('with duplicates =====>');
+      contactsToBeSynced.forEach(i => console.log(i));
+      contactsToBeSynced = await removeAllDuplicateNumbers(contactsToBeSynced);
+      console.log('without duplicates =====>');
+      contactsToBeSynced.forEach(i => console.log(i));
 
       // process the contacts to be synced and store in the db
       // contactsToBeSynced.forEach(c => console.log(c));
@@ -85,6 +92,7 @@ const CustomBottonFloatingSyncButton = ({
           setOpen(false);
         }, 1000);
     } catch (error) {
+      console.log(error);
       setIsLoading(false);
     }
   };
@@ -99,6 +107,16 @@ const CustomBottonFloatingSyncButton = ({
     );
   };
 
+  const removeAllDuplicateNumbers = async contacts => {
+    let seen = {};
+
+    return contacts.filter(item => {
+      return seen.hasOwnProperty(item.number)
+        ? false
+        : (seen[item.number] = true);
+    });
+  };
+
   const removeSpecialCharacterFromNumber = contactNumber => {
     let number = '';
     let index = 0;
@@ -107,13 +125,16 @@ const CustomBottonFloatingSyncButton = ({
       if (contactNumber[index] >= '0' && contactNumber[index] <= '9')
         number += contactNumber[index];
     }
+    // for (let i = 0; i < 10000; i++) {
+    //   console.log('hii');
+    // }
     return number;
   };
 
   const generateparsedContacts = contactInfo => {
     // 1st copy is with what he saved
     let contacts = [];
-    console.log('For contact: => ', contactInfo.number);
+    // console.log('For contact: => ', contactInfo.number);
 
     try {
       // if(contactInfo.number, contactInfo.displayName)

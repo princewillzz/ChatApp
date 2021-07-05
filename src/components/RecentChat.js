@@ -2,6 +2,8 @@ import React from 'react';
 import {StyleSheet, TouchableOpacity, View} from 'react-native';
 import {Avatar, Badge, Button, ListItem} from 'react-native-elements';
 import {Swipeable} from 'react-native-gesture-handler';
+import {deleteChatForUser} from '../db/chatsSchema';
+import {deleteRecentChatUser} from '../db/recent_chat_users';
 
 export default React.memo(
   ({
@@ -11,15 +13,16 @@ export default React.memo(
     userInfo,
   }) => {
     // console.log(
-    //   userInfo.unseen_msg_count,
-    //   userInfo.last_unseen_msg,
-    //   'recent chat',
+    // userInfo.username,
+    // userInfo.unseen_msg_count,
+    // userInfo.last_unseen_msg,
+    // 'recent chat',
     // );
     return (
       <Swipeable
         friction={2}
         overshootLeft={false}
-        renderLeftActions={LeftAction}>
+        renderLeftActions={() => <LeftAction username={userInfo?.username} />}>
         <ListItem
           containerStyle={{elevation: 4}}
           bottomDivider
@@ -81,12 +84,27 @@ export default React.memo(
   },
 );
 
-const LeftAction = () => {
+const LeftAction = ({username}) => {
+  const handleDeleteChat = async () => {
+    try {
+      await deleteChatForUser(username);
+    } catch (error) {
+      console.log(error);
+    }
+
+    try {
+      await deleteRecentChatUser(username);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <Button
       title="Delete"
       icon={{name: 'delete', color: 'white'}}
       buttonStyle={{minHeight: '100%', backgroundColor: 'red'}}
+      onPress={handleDeleteChat}
     />
   );
 };

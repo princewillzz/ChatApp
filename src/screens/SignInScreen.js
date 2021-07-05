@@ -40,12 +40,13 @@ export default function SignInScreen({navigation}) {
     setLoading(true);
 
     // TODO remove later on
-    const tempUsername = username.replace(
-      `+${usernamePhoneInput.current?.getCallingCode()}`,
-      '',
-    );
-    console.log(tempUsername);
-    signIn({username: tempUsername, password}).catch(e => {
+    // const tempUsername = username.replace(
+    //   `+${usernamePhoneInput.current?.getCallingCode()}`,
+    //   '',
+    // );
+    // console.log(tempUsername);
+    console.log(username, password);
+    signIn({username, password}).catch(e => {
       setLoading(false);
       Toast.show({
         type: 'error',
