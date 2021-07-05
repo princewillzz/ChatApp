@@ -112,6 +112,8 @@ export default function RegisterScreen({navigation}) {
       username,
       password,
       verificationOTP,
+      re_password: rePassword,
+      country_code: usernamePhoneInput.current.getCallingCode(),
     };
     signUp(userInfo).catch(e => {
       setLoading(false);

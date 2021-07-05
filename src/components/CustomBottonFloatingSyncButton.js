@@ -26,12 +26,14 @@ const CustomBottonFloatingSyncButton = ({
       // filter and manipulate contact info that are required
       const contactsToBeSynced = contacts
         .flatMap(eachContact =>
-          eachContact.phoneNumbers.map(contactNumber => {
-            return {
-              number: removeSpecialCharacterFromNumber(contactNumber.number),
-              displayName: eachContact.displayName,
-            };
-          }),
+          eachContact.phoneNumbers
+            .map(contactNumber => {
+              return {
+                number: removeSpecialCharacterFromNumber(contactNumber.number),
+                displayName: eachContact.displayName,
+              };
+            })
+            .flatMap(eachContact => generateparsedContacts(eachContact)),
         )
         .filter(
           manipulatedContactInfo =>
@@ -99,11 +101,46 @@ const CustomBottonFloatingSyncButton = ({
 
   const removeSpecialCharacterFromNumber = contactNumber => {
     let number = '';
-    for (let index = 0; index < contactNumber.length; index++) {
+    let index = 0;
+    if (contactNumber[0] === '+') index++;
+    for (index = 0; index < contactNumber.length; index++) {
       if (contactNumber[index] >= '0' && contactNumber[index] <= '9')
         number += contactNumber[index];
     }
     return number;
+  };
+
+  const generateparsedContacts = contactInfo => {
+    // 1st copy is with what he saved
+    let contacts = [];
+    console.log('For contact: => ', contactInfo.number);
+
+    try {
+      // if(contactInfo.number, contactInfo.displayName)
+      if (contactInfo.number[0] !== '+') {
+        const currentUsersCountryCode = currentUserInfo.country_code;
+        let number = contactInfo.number;
+        // 2nd copy
+        contacts.push({
+          ...contactInfo,
+          number: '+' + currentUsersCountryCode + number,
+        });
+
+        // 3rd copy
+        number = number.replace(currentUsersCountryCode, '');
+        contacts.push({
+          ...contactInfo,
+          number: '+' + currentUsersCountryCode + number,
+        });
+      } else {
+        contacts.push(contactInfo);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+
+    // console.log(contacts);
+    return contacts;
   };
 
   const saveFriendsInfoToDB = async (

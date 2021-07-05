@@ -107,6 +107,7 @@ export default function App() {
       username: decodedToken.sub,
       token_id: token,
       image: profile_img_uri,
+      country_code: decodedToken.country_code,
     };
 
     try {
