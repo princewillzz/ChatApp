@@ -25,6 +25,9 @@ import {
 } from '../db/recent_chat_users';
 import {EnumMessageType} from '../utils/EnumMessageType';
 
+import 'react-native-get-random-values';
+import {v4 as uuid} from 'uuid';
+
 export default function ChatScreen({route, navigation}) {
   const {currentUserInfo: meUserInfo} = React.useContext(AuthContext);
 
@@ -90,7 +93,7 @@ export default function ChatScreen({route, navigation}) {
 
   const handleSendMessage = async () => {
     const textChat = {
-      uid: Math.random().toString(),
+      uid: uuid(),
       textMessage: textMessageToBeSent.trim(),
       timestamp: new Date(),
       isMe: true,

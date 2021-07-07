@@ -22,6 +22,9 @@ import {
 } from '../security/RSAEncryptionService';
 import {EnumMessageType} from '../utils/EnumMessageType';
 
+import 'react-native-get-random-values';
+import {v4 as uuid} from 'uuid';
+
 export default function HomeScreen({navigation}) {
   const {currentUserInfo, signOut} = React.useContext(AuthContext);
 
@@ -117,7 +120,7 @@ export default function HomeScreen({navigation}) {
       else throw new Error('Unacceptable Message Type');
 
       const chatMessage = {
-        uid: messageReceived.id + Math.random().toString(),
+        uid: uuid(),
         textMessage: decodedMsg,
         timestamp: new Date(),
         isMe: false,

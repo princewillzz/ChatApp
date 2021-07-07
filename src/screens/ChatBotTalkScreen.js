@@ -13,6 +13,9 @@ import AuthContext from '../auth/auth';
 import ChatBox from '../components/ChatBox';
 import LeftHeaderChatbotScreen from '../components/chatscreen/LeftHeaderChatbotScreen';
 
+import 'react-native-get-random-values';
+import {v4 as uuid} from 'uuid';
+
 export default function ChatBotTalkScreen({route, navigation}) {
   const {currentUserInfo: meUserInfo} = React.useContext(AuthContext);
 
@@ -27,7 +30,7 @@ export default function ChatBotTalkScreen({route, navigation}) {
   const handleSendMessage = async () => {
     setRefreshing(true);
     const textChat = {
-      uid: Math.random().toString(),
+      uid: uuid(),
       textMessage: textMessageToBeSent.trim(),
       timestamp: new Date(),
       isMe: true,
@@ -41,10 +44,10 @@ export default function ChatBotTalkScreen({route, navigation}) {
 
     sendChatMessageToChatBot(textChat, meUserInfo.token_id)
       .then(messageInfo => {
-        console.log(messageInfo.reply);
+        // console.log(messageInfo.reply);
         const replyTextChat = {
-          uid: Math.random().toString(),
-          textMessage: messageInfo?.reply.trim(),
+          uid: uuid(),
+          textMessage: messageInfo?.reply?.trim(),
           timestamp: new Date(),
           isMe: false,
           type: 'text',
@@ -65,7 +68,7 @@ export default function ChatBotTalkScreen({route, navigation}) {
   useEffect(() => {
     setChats([
       {
-        uid: Math.random().toString(),
+        uid: uuid(),
         textMessage: `What's up man?`.trim(),
         timestamp: new Date(),
         isMe: false,
