@@ -8,6 +8,12 @@ export default function ChatScreenHeaderLeft({
   userImage,
   displayName,
 }) {
+  const showDisplayname = () => {
+    if (displayName.length > 10) {
+      return displayName.slice(0, 10) + '...';
+    } else return displayName;
+  };
+
   return (
     <View style={styles.container}>
       <TouchableOpacity
@@ -37,7 +43,7 @@ export default function ChatScreenHeaderLeft({
             icon={{name: 'person-outline', type: 'ionicon'}}
           />
         )}
-        <Text style={styles.chatWithName}>{displayName}</Text>
+        <Text style={styles.chatWithName}>{showDisplayname()}</Text>
       </TouchableOpacity>
     </View>
   );
@@ -48,6 +54,7 @@ const styles = StyleSheet.create({
     // marginLeft: 16,
     flexDirection: 'row',
     alignItems: 'center',
+    minWidth: '100%',
   },
   chatingWithAvatar: {
     marginLeft: 10,
@@ -60,6 +67,6 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     fontSize: 17,
     // backgroundColor: 'blue',
-    width: '100%',
+    minWidth: '100%',
   },
 });

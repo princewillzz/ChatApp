@@ -11,8 +11,8 @@ import {Header, Icon} from 'react-native-elements';
 import {sendTextMessageToUser} from '../api/message-api';
 import AuthContext from '../auth/auth';
 import ChatBox from '../components/ChatBox';
-import ChatScreenHeaderLeft from '../components/ChatScreenHeaderLeft';
-import ChatScreenHeaderRight from '../components/ChatScreenHeaderRight';
+import ChatScreenHeaderLeft from '../components/chatscreen/ChatScreenHeaderLeft';
+import ChatScreenHeaderRight from '../components/chatscreen/ChatScreenHeaderRight';
 import ImageModal from '../components/ImageModal';
 import {
   chatSchemaRealmObject,
@@ -131,6 +131,7 @@ export default function ChatScreen({route, navigation}) {
             navigation={navigation}
           />
         }
+        leftContainerStyle={styles.leftHeaderComponent}
         rightComponent={<ChatScreenHeaderRight />}
       />
       <KeyboardAvoidingView style={styles.container}>
@@ -170,6 +171,9 @@ export default function ChatScreen({route, navigation}) {
 }
 
 const styles = StyleSheet.create({
+  leftHeaderComponent: {
+    minWidth: '20%',
+  },
   container: {
     flex: 1,
     backgroundColor: '#fff',

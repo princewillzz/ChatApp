@@ -5,8 +5,8 @@ import {messagingWebsocketConnectionURI} from '../../config';
 import {initilizeWebsocketObject} from '../api/message-api';
 import AuthContext from '../auth/auth';
 import CustomBottonFloatingSyncButton from '../components/CustomBottonFloatingSyncButton';
-import HomeHeaderLeftView from '../components/HomeHeaderLeftView';
-import HomeHeaderRightView from '../components/HomeHeaderRightView';
+import HomeHeaderLeftView from '../components/home-screen/HomeHeaderLeftView';
+import HomeHeaderRightView from '../components/home-screen/HomeHeaderRightView';
 import ImageModal from '../components/ImageModal';
 import RecentChat from '../components/RecentChat';
 import SearchBox from '../components/SearchBox';
@@ -208,6 +208,7 @@ export default function HomeScreen({navigation}) {
             handleOpenImageModal={handleOpenImageModal}
           />
         }
+        leftContainerStyle={styles.leftHeaderComponent}
         rightComponent={
           <HomeHeaderRightView
             navigation={navigation}
@@ -329,6 +330,9 @@ export default function HomeScreen({navigation}) {
 }
 
 const styles = StyleSheet.create({
+  leftHeaderComponent: {
+    minWidth: '35%',
+  },
   NoRecetChatsContainer: {
     elevation: 4,
     position: 'absolute',

@@ -33,17 +33,20 @@ export default function HomeHeaderLeftView({handleOpenImageModal, image}) {
 
 const styles = StyleSheet.create({
   container: {
-    width: '100%',
-    // backgroundColor: "red",
+    // flex: 1,
+    minWidth: '100%',
+    // backgroundColor: 'red',
     marginLeft: 6,
     flexDirection: 'row',
     alignItems: 'center',
   },
   title: {
+    // backgroundColor: 'yellow',
+    minWidth: '100%',
     marginLeft: 10,
     paddingLeft: 5,
     fontSize: 22,
     fontWeight: '600',
-    // textTransform: "uppercase",
+    // textTransform: 'uppercase',
   },
 });
