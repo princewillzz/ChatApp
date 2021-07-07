@@ -4,11 +4,11 @@ import {Header, Icon, ListItem} from 'react-native-elements';
 import {messagingWebsocketConnectionURI} from '../../config';
 import {initilizeWebsocketObject} from '../api/message-api';
 import AuthContext from '../auth/auth';
-import CustomBottonFloatingSyncButton from '../components/CustomBottonFloatingSyncButton';
+import CustomBottonFloatingSyncButton from '../components/home-screen/CustomBottonFloatingSyncButton';
 import HomeHeaderLeftView from '../components/home-screen/HomeHeaderLeftView';
 import HomeHeaderRightView from '../components/home-screen/HomeHeaderRightView';
 import ImageModal from '../components/ImageModal';
-import RecentChat from '../components/RecentChat';
+import RecentChat from '../components/home-screen/RecentChat';
 import SearchBox from '../components/SearchBox';
 import {insertChats} from '../db/chatsSchema';
 import {

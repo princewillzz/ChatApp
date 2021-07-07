@@ -2,8 +2,8 @@ import React from 'react';
 import {StyleSheet, TouchableOpacity, View} from 'react-native';
 import {Avatar, Badge, Button, ListItem} from 'react-native-elements';
 import {Swipeable} from 'react-native-gesture-handler';
-import {deleteChatForUser} from '../db/chatsSchema';
-import {deleteRecentChatUser} from '../db/recent_chat_users';
+import {deleteChatForUser} from '../../db/chatsSchema';
+import {deleteRecentChatUser} from '../../db/recent_chat_users';
 
 export default React.memo(
   ({
@@ -70,7 +70,9 @@ export default React.memo(
           </View>
 
           <ListItem.Content>
-            <ListItem.Title>{userInfo?.displayName}</ListItem.Title>
+            <ListItem.Title>
+              {userInfo?.displayName?.slice(0, 10)}
+            </ListItem.Title>
             <ListItem.Subtitle>
               {`${userInfo?.last_unseen_msg?.slice(0, 33)}${
                 userInfo?.last_unseen_msg?.length > 33 ? '...' : ''

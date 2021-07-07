@@ -9,7 +9,7 @@ export default function ChatScreenHeaderLeft({
   displayName,
 }) {
   const showDisplayname = () => {
-    if (displayName.length > 10) {
+    if (displayName?.length > 10) {
       return displayName.slice(0, 10) + '...';
     } else return displayName;
   };

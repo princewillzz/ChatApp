@@ -1,13 +1,13 @@
 import React, {useState} from 'react';
 import Contacts from 'react-native-contacts';
-import {Overlay, SpeedDial} from 'react-native-elements';
-import {checkIfUsernameExistsAndFetchUsersInfo} from '../api/users-api';
+import {FAB, Icon, Overlay} from 'react-native-elements';
+import {checkIfUsernameExistsAndFetchUsersInfo} from '../../api/users-api';
 import {
   saveRecentChatUserToDB,
   updateRecentChatUserInfo,
-} from '../db/recent_chat_users';
-import {constructProfilePhotoURIWithImageId} from '../services/utility-service';
-import CustomSyncInfoModal from './CustomSyncInfoModal';
+} from '../../db/recent_chat_users';
+import {constructProfilePhotoURIWithImageId} from '../../services/utility-service';
+import CustomSyncInfoModal from '../CustomSyncInfoModal';
 
 const CustomBottonFloatingSyncButton = ({
   currentUserInfo,
@@ -45,11 +45,11 @@ const CustomBottonFloatingSyncButton = ({
             currentUserInfo.username !== manipulatedContactInfo.number,
         );
 
-      console.log('with duplicates =====>');
-      contactsToBeSynced.forEach(i => console.log(i));
+      // console.log('with duplicates =====>');
+      // contactsToBeSynced.forEach(i => console.log(i));
       contactsToBeSynced = await removeAllDuplicateNumbers(contactsToBeSynced);
-      console.log('without duplicates =====>');
-      contactsToBeSynced.forEach(i => console.log(i));
+      // console.log('without duplicates =====>');
+      // contactsToBeSynced.forEach(i => console.log(i));
 
       // process the contacts to be synced and store in the db
       // contactsToBeSynced.forEach(c => console.log(c));
@@ -61,14 +61,14 @@ const CustomBottonFloatingSyncButton = ({
           currentUserInfo.token_id,
         )
           .then(async contactUserInfo => {
-            console.log(count);
+            // console.log(count);
             try {
               if (
                 recentChatUsers.find(
                   user => user.username === contactUserInfo.username,
                 )
               ) {
-                console.log('Already present');
+                // console.log('Already present');
                 await updateFriendsUserInfo(contactUserInfo, eachContact);
               } else {
                 await saveFriendsInfoToDB(contactUserInfo, eachContact);
@@ -98,7 +98,7 @@ const CustomBottonFloatingSyncButton = ({
   };
 
   const handleAllContactHasBeenSynced = () => {
-    console.log('congo');
+    // console.log('congo');
     handleContactSuccessfullySynced(() =>
       setTimeout(() => {
         setIsLoading(false);
@@ -205,7 +205,7 @@ const CustomBottonFloatingSyncButton = ({
       );
     }
 
-    console.log(profile_img_uri);
+    // console.log(profile_img_uri);
     const updatedFriendsUserInfo = {
       username: apiResponseUserInfo.username,
       displayName: usersContactBookInfo.displayName,
@@ -224,15 +224,15 @@ const CustomBottonFloatingSyncButton = ({
   const [open, setOpen] = useState(false);
   return (
     <>
-      {/* <FAB
+      <FAB
         color="#CCE5FF"
-        icon={() => <Icon name="add" type="ionicon" />}
+        icon={() => <Icon name="sync-outline" type="ionicon" />}
         placement="right"
         style={{padding: 5}}
         onPress={handleSyncContacts}
         loading={isLoading}
-      /> */}
-
+      />
+      {/* 
       <SpeedDial
         color={'#CCE5FF'}
         isOpen={open}
@@ -252,7 +252,7 @@ const CustomBottonFloatingSyncButton = ({
           loading={isLoading}
           onPress={handleSyncContacts}
         />
-      </SpeedDial>
+      </SpeedDial> */}
 
       <Overlay visible={isLoading} ModalComponent={CustomSyncInfoModal} />
     </>
