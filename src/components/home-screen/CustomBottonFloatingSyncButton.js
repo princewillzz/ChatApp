@@ -1,12 +1,15 @@
 import React, {useState} from 'react';
+import {StyleSheet} from 'react-native';
+import {View} from 'react-native';
 import Contacts from 'react-native-contacts';
-import {FAB, Icon, Overlay} from 'react-native-elements';
+import {FAB, Icon, Overlay, SpeedDial} from 'react-native-elements';
 import {checkIfUsernameExistsAndFetchUsersInfo} from '../../api/users-api';
 import {
   saveRecentChatUserToDB,
   updateRecentChatUserInfo,
 } from '../../db/recent_chat_users';
 import {constructProfilePhotoURIWithImageId} from '../../services/utility-service';
+import {allAppColors} from '../../utils/colors';
 import CustomSyncInfoModal from '../CustomSyncInfoModal';
 
 const CustomBottonFloatingSyncButton = ({
@@ -225,15 +228,16 @@ const CustomBottonFloatingSyncButton = ({
   return (
     <>
       <FAB
-        color="#CCE5FF"
+        buttonStyle={styles.circleButton}
+        style={styles.fabStyle}
+        color={allAppColors.primaryBlue}
         icon={() => <Icon name="sync-outline" type="ionicon" />}
         placement="right"
-        style={{padding: 5}}
         onPress={handleSyncContacts}
         loading={isLoading}
       />
-      {/* 
-      <SpeedDial
+
+      {/* <SpeedDial
         color={'#CCE5FF'}
         isOpen={open}
         containerStyle={{margin: 5}}
@@ -260,3 +264,12 @@ const CustomBottonFloatingSyncButton = ({
 };
 
 export default CustomBottonFloatingSyncButton;
+
+const styles = StyleSheet.create({
+  fabStyle: {
+    padding: 4,
+  },
+  circleButton: {
+    borderRadius: 50,
+  },
+});

@@ -15,6 +15,7 @@ import LeftHeaderChatbotScreen from '../components/chatscreen/LeftHeaderChatbotS
 
 import 'react-native-get-random-values';
 import {v4 as uuid} from 'uuid';
+import {allAppColors} from '../utils/colors';
 
 export default function ChatBotTalkScreen({route, navigation}) {
   const {currentUserInfo: meUserInfo} = React.useContext(AuthContext);
@@ -86,7 +87,7 @@ export default function ChatBotTalkScreen({route, navigation}) {
     <>
       <Header
         containerStyle={{
-          backgroundColor: '#ECECEC',
+          backgroundColor: allAppColors.primaryGreySilver,
         }}
         leftComponent={
           <LeftHeaderChatbotScreen
@@ -110,6 +111,7 @@ export default function ChatBotTalkScreen({route, navigation}) {
         <View style={styles.messageInputContainer}>
           <TextInput
             multiline
+            placeholderTextColor={allAppColors.silver}
             style={styles.messageInput}
             placeholder="Enter Text"
             value={textMessageToBeSent}
@@ -152,8 +154,8 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     borderWidth: 1,
     borderColor: 'transparent',
-    backgroundColor: '#ECECEC',
-    color: 'black',
+    backgroundColor: allAppColors.primaryGreySilver,
+    color: allAppColors.darkBlack,
   },
   sendIcon: {
     // backgroundColor: 'yellow',

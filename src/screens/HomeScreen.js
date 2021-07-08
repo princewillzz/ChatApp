@@ -24,6 +24,7 @@ import {EnumMessageType} from '../utils/EnumMessageType';
 
 import 'react-native-get-random-values';
 import {v4 as uuid} from 'uuid';
+import {allAppColors} from '../utils/colors';
 
 export default function HomeScreen({navigation}) {
   const {currentUserInfo, signOut} = React.useContext(AuthContext);
@@ -203,7 +204,7 @@ export default function HomeScreen({navigation}) {
     <>
       <Header
         containerStyle={{
-          backgroundColor: '#ECECEC',
+          backgroundColor: allAppColors.primaryGreySilver,
         }}
         leftComponent={
           <HomeHeaderLeftView
@@ -237,7 +238,7 @@ export default function HomeScreen({navigation}) {
           <ListItem
             style={styles.NoRecetChatsContainer}
             containerStyle={{
-              backgroundColor: '#CCE5FF',
+              backgroundColor: allAppColors.primaryBlue,
             }}
             bottomDivider>
             <ListItem.Content
@@ -295,7 +296,7 @@ export default function HomeScreen({navigation}) {
               <ListItem
                 style={styles.nothingFoundSearch}
                 containerStyle={{
-                  backgroundColor: '#ECECEC',
+                  backgroundColor: allAppColors.primaryGreySilver,
                 }}
                 bottomDivider>
                 <ListItem.Content

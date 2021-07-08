@@ -27,6 +27,7 @@ import {EnumMessageType} from '../utils/EnumMessageType';
 
 import 'react-native-get-random-values';
 import {v4 as uuid} from 'uuid';
+import {allAppColors} from '../utils/colors';
 
 export default function ChatScreen({route, navigation}) {
   const {currentUserInfo: meUserInfo} = React.useContext(AuthContext);
@@ -153,6 +154,7 @@ export default function ChatScreen({route, navigation}) {
         <View style={styles.messageInputContainer}>
           <TextInput
             multiline
+            placeholderTextColor={allAppColors.silver}
             style={styles.messageInput}
             placeholder="Enter Text"
             value={textMessageToBeSent}
@@ -204,7 +206,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'transparent',
     backgroundColor: '#ECECEC',
-    color: 'black',
+    color: allAppColors.darkBlack,
   },
   sendIcon: {
     // backgroundColor: 'yellow',
