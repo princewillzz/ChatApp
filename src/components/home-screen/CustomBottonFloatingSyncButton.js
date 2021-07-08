@@ -71,7 +71,6 @@ const CustomBottonFloatingSyncButton = ({
                   user => user.username === contactUserInfo.username,
                 )
               ) {
-                // console.log('Already present');
                 await updateFriendsUserInfo(contactUserInfo, eachContact);
               } else {
                 await saveFriendsInfoToDB(contactUserInfo, eachContact);
@@ -171,7 +170,7 @@ const CustomBottonFloatingSyncButton = ({
     apiResponseUserInfo,
     usersContactBookInfo,
   ) => {
-    const profile_img_uri = null;
+    let profile_img_uri = null;
 
     if (apiResponseUserInfo?.profile_picture) {
       profile_img_uri = constructProfilePhotoURIWithImageId(
