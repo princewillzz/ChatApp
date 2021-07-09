@@ -2,6 +2,7 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import jwtDecode from 'jwt-decode';
 import React from 'react';
+import {Platform} from 'react-native';
 import Toast from 'react-native-toast-message';
 import {signinUser} from './src/api/auth-api';
 import {registerUser} from './src/api/users-api';
@@ -20,6 +21,7 @@ import {
   generateRsaKeys,
   saveGeneratedRSAKeys,
 } from './src/security/RSAEncryptionService';
+import {handleGiveContactPermission} from './src/services/TakeUserPermissions';
 import {constructProfilePhotoURIWithImageId} from './src/services/utility-service';
 
 const Stack = createStackNavigator();
@@ -58,6 +60,9 @@ export default function App() {
   );
 
   React.useEffect(() => {
+    if (Platform.OS === 'android') {
+      handleGiveContactPermission().catch(e => console.log(e));
+    }
     // deleteAllUsers().then(() => console.log('Success deleted'));
 
     // fetchAllUsers().then(users => console.log(users));
