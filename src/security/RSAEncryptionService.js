@@ -5,24 +5,45 @@ import SecureStorage, {
   ACCESSIBLE,
   AUTHENTICATION_TYPE,
 } from 'react-native-secure-storage';
+import {updatePublicRSAKeyToken} from '../api/users-api';
 
 let rsa_keys = null;
+
 /**
  * Generate keys and initiate the public state
  * @returns Promise
  */
-export const generateRsaKeys = async userId => {
+export const generateRsaKeys = async () => {
   return RSA.generateKeys(4096) // set key size
     .then(async keys => {
-      await SecureStorage.setItem(userId, JSON.stringify(keys));
+      // await SecureStorage.setItem(userId, JSON.stringify(keys));
       rsa_keys = keys;
       return keys;
     });
 };
 
+export const saveGeneratedRSAKeys = async userId => {
+  if (!rsa_keys) throw new Error('Keys are not initialized');
+  await SecureStorage.setItem(userId, JSON.stringify(rsa_keys));
+};
+
 export const initiateRSAKeysInitialization = async userId => {
   const keys = await SecureStorage.getItem(userId);
   rsa_keys = JSON.parse(keys);
+
+  if (!keys || !rsa_keys) {
+    throw new Error('No Keys Found!!');
+  }
+};
+
+export const reInitializeKeysSaveAndSyncIt = async (userId, user_token_id) => {
+  const generatedKeys = await generateRsaKeys();
+  console.log('generated!!');
+  // Sync with the server
+  await updatePublicRSAKeyToken(generatedKeys.public, user_token_id);
+  // Save keys
+  await saveGeneratedRSAKeys(userId);
+  console.log('saved success');
 };
 
 /**

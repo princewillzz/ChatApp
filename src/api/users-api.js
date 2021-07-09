@@ -62,3 +62,27 @@ export const uploadUserProfilePhoto = async (image, myAuthToken) => {
     return data;
   });
 };
+
+export const updatePublicRSAKeyToken = async (rsa_public_key, myAuthToken) => {
+  const URI = `${baseURL}/api/secured/users/rsa-public-key`;
+  const body = {
+    rsa_public_key,
+  };
+  return fetch(URI, {
+    method: 'PUT',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${myAuthToken}`,
+    },
+    body: JSON.stringify(body),
+  })
+    .then(res => {
+      if (res.ok) return res.json();
+      if (res.status === 404) throw new Error('User not found');
+      throw new Error('Something went wrong');
+    })
+    .then(data => {
+      return data;
+    });
+};

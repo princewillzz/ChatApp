@@ -16,7 +16,10 @@ import ChatScreen from './src/screens/ChatScreen';
 import HomeScreenDrawerNavigation from './src/screens/HomeScreenDrawerNavigation';
 import RegisterScreen from './src/screens/RegisterScreen';
 import SignInScreen from './src/screens/SignInScreen';
-import {generateRsaKeys} from './src/security/RSAEncryptionService';
+import {
+  generateRsaKeys,
+  saveGeneratedRSAKeys,
+} from './src/security/RSAEncryptionService';
 import {constructProfilePhotoURIWithImageId} from './src/services/utility-service';
 
 const Stack = createStackNavigator();
@@ -89,6 +92,7 @@ export default function App() {
     bootstrapAsync();
 
     return () => {
+      console.log('Fucking app screen');
       setCurrentUserInfo({});
     };
   }, []);
@@ -109,25 +113,6 @@ export default function App() {
       image: profile_img_uri,
       country_code: decodedToken.country_code,
     };
-
-    try {
-      console.log(decodedToken);
-      // fetchUserById(currentUserInfo.token_id)
-      //   .then(user => {
-      //     let imageURI = null;
-
-      //     if (user?.imageId) {
-      //       imageURI = constructProfilePhotoURIWithImageId(user.imageId);
-      //       setCurrentUserInfo({...currentUserInfo, image: imageURI});
-      //     }
-      //   })
-      //   .catch(e => {
-      //     console.log(e);
-      //   });
-    } catch (error) {
-      console.log(error);
-    }
-
     setCurrentUserInfo(currentUserInfo);
   };
 
@@ -155,9 +140,10 @@ export default function App() {
       },
       signUp: async userInfo => {
         // ISSUE right here
-        const rsa_keys = await generateRsaKeys(userInfo.username);
+        const rsa_keys = await generateRsaKeys();
         userInfo.publicRSAKey = rsa_keys.public;
         return registerUser(userInfo).then(responseData => {
+          saveGeneratedRSAKeys(userInfo.username);
           insertUserSignedIn({
             token_id: responseData.id_token,
             loggedAt: new Date().toUTCString(),

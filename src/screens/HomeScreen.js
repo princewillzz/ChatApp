@@ -18,7 +18,10 @@ import {
 } from '../db/recent_chat_users';
 import {
   decryptTestMessage,
+  generateRsaKeys,
   initiateRSAKeysInitialization,
+  reInitializeKeysSaveAndSyncIt,
+  saveGeneratedRSAKeys,
 } from '../security/RSAEncryptionService';
 import {EnumMessageType} from '../utils/EnumMessageType';
 
@@ -74,22 +77,39 @@ export default function HomeScreen({navigation}) {
   useEffect(() => {
     loadRecentChatUserFromTheDataStore();
 
-    setTimeout(() => {
-      initiateWebsocketConnection();
-    }, 1000);
+    initiateRSAKeysInitialization(currentUserInfo.username)
+      .catch(async e => {
+        let erroredOut = true;
+        while (erroredOut) {
+          try {
+            await reInitializeKeysSaveAndSyncIt(
+              currentUserInfo.username,
+              currentUserInfo.token_id,
+            );
+            erroredOut = false;
+          } catch (error) {
+            console.log('Errored out');
+            erroredOut = true;
+          }
+        }
+      })
+      .finally(() => {
+        setTimeout(() => {
+          initiateWebsocketConnection();
+        }, 1000);
 
-    recentChatsSchemaRealmObject.addListener('change', () => {
-      setRefreshingRecentFlatList(true);
-      setTimeout(() => {
-        setRefreshingRecentFlatList(false);
-      }, 0);
-    });
+        recentChatsSchemaRealmObject.addListener('change', () => {
+          setRefreshingRecentFlatList(true);
+          setTimeout(() => {
+            setRefreshingRecentFlatList(false);
+          }, 0);
+        });
+      });
 
     // removeAllRecentChats();
     return () => {
-      handleDisconnectMessagingWebsocket();
-      recentChatsSchemaRealmObject.removeAllListeners();
-      websocket.current = null;
+      console.log('Fucking home');
+      unsubscribe();
     };
   }, []);
 
@@ -162,7 +182,8 @@ export default function HomeScreen({navigation}) {
 
   // Disconnect the websocket
   const handleDisconnectMessagingWebsocket = useCallback(async () => {
-    websocket.current.close();
+    // console.log(websocket.current);
+    if (websocket.current) websocket.current.close();
   }, []);
 
   // On websocket gets disconnected
@@ -185,20 +206,15 @@ export default function HomeScreen({navigation}) {
     activeChatingWithFriendId.current = userId;
     // console.log(userId);
   };
-  useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', () => {
-      handleChangeActiveChatingWithFriendId(null);
-    });
 
-    // test_rsa(currentUserInfo.username).catch(e => console.log(e))
-    initiateRSAKeysInitialization(currentUserInfo.username);
+  const unsubscribe = navigation.addListener('focus', () => {
+    handleChangeActiveChatingWithFriendId(null);
 
-    // removeAllRecentChats().catch(e => {})
-    return () => {
-      activeChatingWithFriendId.current = null;
-      unsubscribe();
-    };
-  }, []);
+    handleDisconnectMessagingWebsocket();
+    recentChatsSchemaRealmObject.removeAllListeners();
+    // websocket.current = null;
+    activeChatingWithFriendId.current = null;
+  });
 
   return (
     <>

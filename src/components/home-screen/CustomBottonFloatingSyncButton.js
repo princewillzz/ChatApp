@@ -105,7 +105,7 @@ const CustomBottonFloatingSyncButton = ({
       setTimeout(() => {
         setIsLoading(false);
         setOpen(false);
-      }, 1000),
+      }, 500),
     );
   };
 
