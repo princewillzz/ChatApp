@@ -98,7 +98,7 @@ export default function App() {
     bootstrapAsync().finally(() => {
       setTimeout(() => {
         SplashScreen.hide();
-      }, 2000);
+      }, 200);
     });
 
     return () => {
