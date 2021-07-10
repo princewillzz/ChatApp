@@ -174,9 +174,11 @@ export default function HomeScreen({navigation}) {
     if (e?.message?.includes('401 Unauthorized')) {
       signOut();
     } else {
+      let reconnectWSAfter = 10000;
       setTimeout(() => {
         initiateWebsocketConnection();
-      }, 2000);
+        reconnectWSAfter *= 2;
+      }, reconnectWSAfter);
     }
   }, []);
 

@@ -3,6 +3,7 @@ import {createStackNavigator} from '@react-navigation/stack';
 import jwtDecode from 'jwt-decode';
 import React from 'react';
 import {Platform} from 'react-native';
+import SplashScreen from 'react-native-splash-screen';
 import Toast from 'react-native-toast-message';
 import {signinUser} from './src/api/auth-api';
 import {registerUser} from './src/api/users-api';
@@ -94,7 +95,11 @@ export default function App() {
       dispatch({type: 'RESTORE_TOKEN', token: userToken});
     };
 
-    bootstrapAsync();
+    bootstrapAsync().finally(() => {
+      setTimeout(() => {
+        SplashScreen.hide();
+      }, 2000);
+    });
 
     return () => {
       console.log('Fucking app screen');

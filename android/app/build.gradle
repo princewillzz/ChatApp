@@ -199,6 +199,8 @@ android {
 
 dependencies {
 
+    implementation project(':react-native-splash-screen')
+
     implementation project(':react-native-secure-storage')
 
     implementation project(':react-native-contacts')
