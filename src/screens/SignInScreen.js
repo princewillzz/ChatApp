@@ -12,8 +12,8 @@ import Toast from 'react-native-toast-message';
 import AuthContext from '../auth/auth';
 
 export default function SignInScreen({navigation}) {
-  const [username, setUsername] = React.useState('+918918930270');
-  const [password, setPassword] = React.useState('pass');
+  const [username, setUsername] = React.useState('');
+  const [password, setPassword] = React.useState('');
 
   const [isLoading, setLoading] = React.useState(true);
 
