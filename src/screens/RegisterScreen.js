@@ -15,9 +15,9 @@ import {sendOTPToVerifyNumberDuringRegistration} from '../api/auth-api';
 import AuthContext from '../auth/auth';
 
 export default function RegisterScreen({navigation}) {
-  const [username, setUsername] = useState('+918918930270');
-  const [password, setPassword] = useState('pass');
-  const [rePassword, setRePassword] = useState('pass');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [rePassword, setRePassword] = useState('');
 
   const [isLoading, setLoading] = useState(true);
 

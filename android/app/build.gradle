@@ -199,6 +199,10 @@ android {
 
 dependencies {
 
+    implementation 'com.google.firebase:firebase-analytics:17.4.1'
+
+    implementation project(':react-native-splash-screen')
+
     implementation project(':react-native-secure-storage')
 
     implementation project(':react-native-contacts')
@@ -246,3 +250,5 @@ project.ext.vectoricons = [
 ]
 
 apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"
+
+apply plugin: 'com.google.gms.google-services'
