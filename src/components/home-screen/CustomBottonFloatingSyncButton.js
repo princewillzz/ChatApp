@@ -1,9 +1,8 @@
 import React, {useState} from 'react';
 import {StyleSheet} from 'react-native';
-import {View} from 'react-native';
 import Contacts from 'react-native-contacts';
-import {FAB, Icon, Overlay, SpeedDial} from 'react-native-elements';
-import {checkIfUsernameExistsAndFetchUsersInfo} from '../../api/users-api';
+import {FAB, Icon, Overlay} from 'react-native-elements';
+import {checkIfUserListExistsAndFetchUsersInfo} from '../../api/users-api';
 import {
   saveRecentChatUserToDB,
   updateRecentChatUserInfo,
@@ -19,86 +18,6 @@ const CustomBottonFloatingSyncButton = ({
 }) => {
   const [isLoading, setIsLoading] = React.useState(false);
 
-  // sync contacts
-  const handleSyncContacts = async () => {
-    setIsLoading(true);
-
-    try {
-      // read all contacts from the phone contact book
-      const contacts = await Contacts.getAll();
-      // filter and manipulate contact info that are required
-      let contactsToBeSynced = contacts
-        .flatMap(eachContact =>
-          eachContact.phoneNumbers
-            .map(contactNumber => {
-              return {
-                number: removeSpecialCharacterFromNumber(contactNumber.number),
-                displayName: eachContact.displayName,
-              };
-            })
-            .flatMap(eachContact => generateparsedContacts(eachContact)),
-        )
-
-        .filter(
-          manipulatedContactInfo =>
-            manipulatedContactInfo &&
-            // !recentChatUsers.find(
-            //   user => user.username === manipulatedContactInfo.number,
-            // ) &&
-            currentUserInfo.username !== manipulatedContactInfo.number,
-        );
-
-      // console.log('with duplicates =====>');
-      // contactsToBeSynced.forEach(i => console.log(i));
-      contactsToBeSynced = await removeAllDuplicateNumbers(contactsToBeSynced);
-      // console.log('without duplicates =====>');
-      // contactsToBeSynced.forEach(i => console.log(i));
-
-      // process the contacts to be synced and store in the db
-      // contactsToBeSynced.forEach(c => console.log(c));
-
-      let count = 0;
-      contactsToBeSynced.map(eachContact =>
-        checkIfUsernameExistsAndFetchUsersInfo(
-          eachContact.number,
-          currentUserInfo.token_id,
-        )
-          .then(async contactUserInfo => {
-            // console.log(count);
-            try {
-              if (
-                recentChatUsers.find(
-                  user => user.username === contactUserInfo.username,
-                )
-              ) {
-                await updateFriendsUserInfo(contactUserInfo, eachContact);
-              } else {
-                await saveFriendsInfoToDB(contactUserInfo, eachContact);
-              }
-            } catch (error) {
-              console.log('error saving- ', error);
-            }
-            // console.log(++count);
-            ++count >= contactsToBeSynced.length &&
-              handleAllContactHasBeenSynced();
-          })
-          .catch(e => {
-            console.log(e, count);
-            ++count >= contactsToBeSynced.length &&
-              handleAllContactHasBeenSynced();
-          }),
-      );
-      if (contactsToBeSynced.length <= 0)
-        setTimeout(() => {
-          setIsLoading(false);
-          setOpen(false);
-        }, 1000);
-    } catch (error) {
-      console.log(error);
-      setIsLoading(false);
-    }
-  };
-
   const handleAllContactHasBeenSynced = () => {
     // console.log('congo');
     handleContactSuccessfullySynced(() =>
@@ -107,6 +26,111 @@ const CustomBottonFloatingSyncButton = ({
         setOpen(false);
       }, 500),
     );
+  };
+
+  // sync contacts
+
+  const handleSyncContacts = async () => {
+    setIsLoading(true);
+    try {
+      await actuallyHandleContactSync();
+    } catch (error) {
+      console.log('Error While syncing', error);
+    }
+    handleAllContactHasBeenSynced();
+  };
+
+  const actuallyHandleContactSync = async () => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        // number, displayName
+        const contactsToBeSynced = await getParsedAndProcessedContacts();
+        // Create a hashmap of recentchatuser with username as key and index in array as value
+        const recentChatUsersMap = new Map();
+        recentChatUsers.forEach((contact, index) =>
+          recentChatUsersMap.set(contact.username, index),
+        );
+        // Create a hashmap of contact to be synced with username as key and index in array as value
+        // Also create a list of username string to be synced
+        const contactsToBeSyncedMap = new Map();
+        const usernameList = contactsToBeSynced.map((contact, index) => {
+          contactsToBeSyncedMap.set(contact.number, index);
+          return contact.number;
+        });
+
+        // Fetch contacts info from the server
+        const syncedContacts = await checkIfUserListExistsAndFetchUsersInfo(
+          usernameList,
+          currentUserInfo.token_id,
+        );
+        syncedContacts.forEach((syncedContactUserInfo, indexSync) => {
+          if (recentChatUsersMap.has(syncedContactUserInfo.username)) {
+            let index = contactsToBeSyncedMap.get(
+              syncedContactUserInfo.username,
+            );
+            // console.log('Update: ', syncedContactUserInfo.username);
+            updateFriendsUserInfo(
+              syncedContactUserInfo,
+              contactsToBeSynced[index],
+            ).catch(e => console.log(e));
+          } else {
+            let index = contactsToBeSyncedMap.get(
+              syncedContactUserInfo.username,
+            );
+            // console.log('save: ', syncedContactUserInfo.username);
+            saveFriendsInfoToDB(
+              syncedContactUserInfo,
+              contactsToBeSynced[index],
+            ).catch(e => console.log(e));
+          }
+          if (indexSync === syncedContacts.length - 1) {
+            // setTimeout(() => {
+            // handleAllContactHasBeenSynced();
+            resolve();
+            // }, 0);
+          }
+        });
+      } catch (error) {
+        reject(error);
+      }
+    });
+  };
+
+  /**
+   *
+   * @returns list of contacts object
+   */
+  const getParsedAndProcessedContacts = async () => {
+    const contacts = await Contacts.getAll();
+    // filter and manipulate contact info that are required
+    let contactsToBeSynced = contacts
+      .flatMap(eachContact =>
+        eachContact.phoneNumbers
+          .map(contactNumber => {
+            return {
+              number: removeSpecialCharacterFromNumber(contactNumber.number),
+              displayName: eachContact.displayName,
+            };
+          })
+          .flatMap(eachContact => generateparsedContacts(eachContact)),
+      )
+
+      .filter(
+        manipulatedContactInfo =>
+          manipulatedContactInfo &&
+          // !recentChatUsers.find(
+          //   user => user.username === manipulatedContactInfo.number,
+          // ) &&
+          currentUserInfo.username !== manipulatedContactInfo.number,
+      );
+
+    // console.log('with duplicates =====>');
+    // contactsToBeSynced.forEach(i => console.log(i));
+    contactsToBeSynced = await removeAllDuplicateNumbers(contactsToBeSynced);
+    // console.log('without duplicates =====>');
+    // contactsToBeSynced.forEach(i => console.log(i));
+
+    return contactsToBeSynced;
   };
 
   const removeAllDuplicateNumbers = async contacts => {
@@ -219,9 +243,22 @@ const CustomBottonFloatingSyncButton = ({
     updateRecentChatUserInfo(updatedFriendsUserInfo).catch(e => console.log(e));
   };
 
-  // useEffect(() => {
-  //   removeAllRecentChats();
-  // }, []);
+  React.useEffect(() => {
+    actuallyHandleContactSync().catch(e => {});
+    const syncOnce = setInterval(async () => {
+      try {
+        if (recentChatUsers.length > 0) {
+          await actuallyHandleContactSync();
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    }, 1000 * 60 * 1);
+
+    return () => {
+      clearInterval(syncOnce);
+    };
+  }, [recentChatUsers]);
 
   const [open, setOpen] = useState(false);
   return (

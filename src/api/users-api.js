@@ -24,6 +24,25 @@ export const registerUser = async userInfo => {
     });
 };
 
+export const checkIfUserListExistsAndFetchUsersInfo = async (
+  listOfUsernames,
+  myAuthToken,
+) => {
+  const URI = `${baseURL}/api/secured/users/exists`;
+  return fetch(URI, {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${myAuthToken}`,
+    },
+    body: JSON.stringify(listOfUsernames),
+  }).then(res => {
+    if (res.ok) return res.json();
+    else throw new Error('Something went wrong');
+  });
+};
+
 export const checkIfUsernameExistsAndFetchUsersInfo = async (
   username,
   myAuthToken,
