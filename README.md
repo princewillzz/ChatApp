@@ -24,7 +24,7 @@ fork and clone this https://github.com/princewillzz/websocket-rabbitmq repositor
 => follow instruction in this link to setup backend of the application 
 
 
-After completing backend setup, it is really simple to setup untangledchat frontend
+After completing backend setup, it is really simple to setup untangledchat's frontend
 
 Fork and clone the repository
 
