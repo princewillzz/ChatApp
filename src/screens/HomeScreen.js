@@ -34,6 +34,10 @@ export default function HomeScreen({navigation}) {
 
   const [recentChatUsers, setRecentChatUsers] = useState([]);
 
+  // Indicator to load or sync contact for the sync component
+  const [startSyncIndicatorBoolean, setStartSyncIndicatorBoolean] =
+    useState(false);
+
   // search feature
   const [showSearchBox, setShowSearchBox] = useState(false);
   const [searchResultUsers, setSearchResultUsers] = useState([]);
@@ -108,10 +112,20 @@ export default function HomeScreen({navigation}) {
 
     // removeAllRecentChats();
     return () => {
-      console.log('Fucking home');
-      unsubscribe();
+      // console.log('Fucking home');
+
+      handleDisconnectMessagingWebsocket();
+      recentChatsSchemaRealmObject.removeAllListeners();
     };
   }, []);
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      handleChangeActiveChatingWithFriendId(null);
+    });
+
+    return unsubscribe;
+  }, [navigation]);
 
   const websocket = useRef(null);
 
@@ -158,11 +172,11 @@ export default function HomeScreen({navigation}) {
               chatMessage.textMessage,
               activeChatingWithFriendId.current,
             ) // .then(() => console.log('message: ', chatMessage.textMessage))
-              .catch(e => console.log(e));
+              .catch(e => console.log('e1', e));
         })
-        .catch(e => console.log(e));
+        .catch(e => console.log('e2', e));
     } catch (e) {
-      console.log(e);
+      console.log('e3', e);
     }
   }, []);
 
@@ -184,7 +198,7 @@ export default function HomeScreen({navigation}) {
 
   // Disconnect the websocket
   const handleDisconnectMessagingWebsocket = useCallback(async () => {
-    // console.log(websocket.current);
+    // console.log('Disconnect: ', websocket.current);
     if (websocket.current) websocket.current.close();
   }, []);
 
@@ -199,6 +213,9 @@ export default function HomeScreen({navigation}) {
       .catch(e => console.log(e))
       .finally(() => {
         if (typeof callback === 'function') callback();
+      })
+      .finally(() => {
+        setStartSyncIndicatorBoolean(true);
       });
   };
 
@@ -208,15 +225,6 @@ export default function HomeScreen({navigation}) {
     activeChatingWithFriendId.current = userId;
     // console.log(userId);
   };
-
-  const unsubscribe = navigation.addListener('focus', () => {
-    handleChangeActiveChatingWithFriendId(null);
-
-    handleDisconnectMessagingWebsocket();
-    recentChatsSchemaRealmObject.removeAllListeners();
-    // websocket.current = null;
-    activeChatingWithFriendId.current = null;
-  });
 
   return (
     <>
@@ -339,6 +347,7 @@ export default function HomeScreen({navigation}) {
         currentUserInfo={currentUserInfo}
         recentChatUsers={recentChatUsers}
         handleContactSuccessfullySynced={loadRecentChatUserFromTheDataStore}
+        startSyncingBoolean={startSyncIndicatorBoolean}
       />
 
       <ImageModal

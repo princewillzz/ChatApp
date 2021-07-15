@@ -15,6 +15,7 @@ const CustomBottonFloatingSyncButton = ({
   currentUserInfo,
   recentChatUsers,
   handleContactSuccessfullySynced,
+  startSyncingBoolean,
 }) => {
   const [isLoading, setIsLoading] = React.useState(false);
 
@@ -244,21 +245,25 @@ const CustomBottonFloatingSyncButton = ({
   };
 
   React.useEffect(() => {
-    actuallyHandleContactSync().catch(e => {});
-    const syncOnce = setInterval(async () => {
-      try {
-        if (recentChatUsers.length > 0) {
-          await actuallyHandleContactSync();
+    if (startSyncingBoolean) {
+      actuallyHandleContactSync().catch(e => {
+        console.log(e);
+      });
+      const syncOnce = setInterval(async () => {
+        try {
+          if (recentChatUsers.length > 0) {
+            await actuallyHandleContactSync();
+          }
+        } catch (error) {
+          console.log(error);
         }
-      } catch (error) {
-        console.log(error);
-      }
-    }, 1000 * 60 * 1);
+      }, 1000 * 60 * 1);
 
-    return () => {
-      clearInterval(syncOnce);
-    };
-  }, [recentChatUsers]);
+      return () => {
+        clearInterval(syncOnce);
+      };
+    }
+  }, [recentChatUsers, startSyncingBoolean]);
 
   const [open, setOpen] = useState(false);
   return (

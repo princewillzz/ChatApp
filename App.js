@@ -102,7 +102,7 @@ export default function App() {
     });
 
     return () => {
-      console.log('Fucking app screen');
+      // console.log('Fucking app screen');
       setCurrentUserInfo({});
     };
   }, []);
