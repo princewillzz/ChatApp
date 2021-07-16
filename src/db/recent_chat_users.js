@@ -13,9 +13,8 @@ export const fetchAllRecentChatUsers = () =>
       .then(realm => {
         const recentChatUsers = realm
           .objects(RECENT_CHAT_USERS_SCHEMA)
-          .sorted(RecentChatUsersSchema.properties.last_updated, true);
+          .sorted('last_updated', true);
 
-        // console.log(recentChatUsers);
         resolve(recentChatUsers);
       })
       .catch(error => reject(error));
