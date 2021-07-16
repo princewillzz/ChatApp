@@ -237,7 +237,7 @@ const CustomBottonFloatingSyncButton = ({
       username: apiResponseUserInfo.username,
       displayName: usersContactBookInfo.displayName,
       user_image: profile_img_uri,
-      last_updated: new Date(),
+      // last_updated: new Date(),
       rsa_public_key: apiResponseUserInfo?.publicRSAKey,
     };
 

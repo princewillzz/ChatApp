@@ -11,7 +11,11 @@ export const fetchAllRecentChatUsers = () =>
   new Promise((resolve, reject) => {
     Realm.open(RecentChatUserdatabaseOptions)
       .then(realm => {
-        const recentChatUsers = realm.objects(RECENT_CHAT_USERS_SCHEMA);
+        const recentChatUsers = realm
+          .objects(RECENT_CHAT_USERS_SCHEMA)
+          .sorted(RecentChatUsersSchema.properties.last_updated, true);
+
+        // console.log(recentChatUsers);
         resolve(recentChatUsers);
       })
       .catch(error => reject(error));
@@ -58,6 +62,7 @@ export const updateLastMessageAndCount = (
 
           if (recentChatUser.length > 0) {
             recentChatUser[0].last_unseen_msg = message;
+            recentChatUser[0].last_updated = new Date();
 
             // console.log(recentChatUser[0].user_id, activeChatingWithFriendId);
             if (activeChatingWithFriendId !== recentChatUser[0].user_id) {
@@ -104,7 +109,7 @@ export const updateRecentChatUserInfo = friendsUserInfo =>
             recentChatUser[0].username = friendsUserInfo.username;
             recentChatUser[0].displayName = friendsUserInfo.displayName;
             recentChatUser[0].user_image = friendsUserInfo.user_image;
-            recentChatUser[0].last_updated = friendsUserInfo.last_updated;
+            // recentChatUser[0].last_updated = friendsUserInfo.last_updated;
             recentChatUser[0].rsa_public_key = friendsUserInfo.rsa_public_key;
           }
           resolve();
