@@ -95,11 +95,13 @@ export default function App() {
       dispatch({type: 'RESTORE_TOKEN', token: userToken});
     };
 
-    bootstrapAsync().finally(() => {
-      setTimeout(() => {
-        SplashScreen.hide();
-      }, 200);
-    });
+    bootstrapAsync()
+      .catch(e => console.log(e))
+      .finally(() => {
+        setTimeout(() => {
+          SplashScreen.hide();
+        }, 200);
+      });
 
     return () => {
       // console.log('Fucking app screen');
