@@ -8,13 +8,12 @@ import {
   View,
 } from 'react-native';
 import {Header, Icon} from 'react-native-elements';
+import 'react-native-get-random-values';
+import {v4 as uuid} from 'uuid';
 import {sendChatMessageToChatBot} from '../api/chatbot-api';
 import AuthContext from '../auth/auth';
 import ChatBox from '../components/ChatBox';
 import LeftHeaderChatbotScreen from '../components/chatscreen/LeftHeaderChatbotScreen';
-
-import 'react-native-get-random-values';
-import {v4 as uuid} from 'uuid';
 import {allAppColors} from '../utils/colors';
 
 export default function ChatBotTalkScreen({route, navigation}) {
