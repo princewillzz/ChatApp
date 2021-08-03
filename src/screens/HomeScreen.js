@@ -1,4 +1,5 @@
 import React, {useCallback, useEffect, useRef, useState} from 'react';
+import {AppState} from 'react-native';
 import {FlatList, StyleSheet, View} from 'react-native';
 import {Header, Icon, ListItem} from 'react-native-elements';
 import 'react-native-get-random-values';
@@ -29,6 +30,8 @@ import {EnumMessageType} from '../utils/EnumMessageType';
 
 export default function HomeScreen({navigation}) {
   const {currentUserInfo, signOut} = React.useContext(AuthContext);
+
+  const appState = useRef(AppState.currentState);
 
   const [recentChatUsers, setRecentChatUsers] = useState([]);
 
@@ -232,12 +235,23 @@ export default function HomeScreen({navigation}) {
     console.log(activeChatingWithFriendId.current);
     console.log('Popping out right here');
     notifyService.current.localNotif(title, message);
+
+    if (appState.current === 'active') {
+      setTimeout(() => {
+        notifyService.current.cancelAll();
+      }, 5000);
+    }
   };
 
   const notifyService = useRef(null);
 
   React.useEffect(() => {
     notifyService.current = new NotifService();
+    if (appState.current === 'active') {
+      setTimeout(() => {
+        notifyService.current.cancelAll();
+      }, 500);
+    }
   }, []);
 
   return (
