@@ -165,11 +165,12 @@ export default function HomeScreen({navigation}) {
       insertChats(chatMessage)
         .then(() => {
           if (messageReceived.type === EnumMessageType.TEXT) {
-            showPopNotication();
+            // showPopNotication(chatMessage.send_to_id, chatMessage.textMessage);
             updateLastMessageAndCount(
               chatMessage.send_to_id,
               chatMessage.textMessage,
               activeChatingWithFriendId.current,
+              showPopNotication,
             ) // .then(() => console.log('message: ', chatMessage.textMessage))
               .catch(e => console.log('e1', e));
           }
@@ -227,10 +228,10 @@ export default function HomeScreen({navigation}) {
   };
 
   // Handling notification
-  const showPopNotication = () => {
+  const showPopNotication = (title, message) => {
     console.log(activeChatingWithFriendId.current);
     console.log('Popping out right here');
-    notifyService.current.localNotif('hii', 'hi1');
+    notifyService.current.localNotif(title, message);
   };
 
   const notifyService = useRef(null);
