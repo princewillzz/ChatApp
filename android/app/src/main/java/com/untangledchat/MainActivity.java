@@ -21,4 +21,10 @@ public class MainActivity extends ReactActivity {
     SplashScreen.show(this, R.style.SplashScreenTheme); // here
     super.onCreate(savedInstanceState);
   }
+
+  @Override
+  public void invokeDefaultOnBackPressed() {
+    // do not call super. invokeDefaultOnBackPressed() as it will close the app.  Instead lets just put it in the background.
+    moveTaskToBack(true);
+  }
 }
