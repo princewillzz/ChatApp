@@ -1,14 +1,17 @@
 import React, {useCallback, useEffect, useRef, useState} from 'react';
+import {AppState} from 'react-native';
 import {FlatList, StyleSheet, View} from 'react-native';
 import {Header, Icon, ListItem} from 'react-native-elements';
+import 'react-native-get-random-values';
+import {v4 as uuid} from 'uuid';
 import {messagingWebsocketConnectionURI} from '../../config';
 import {initilizeWebsocketObject} from '../api/message-api';
 import AuthContext from '../auth/auth';
 import CustomBottonFloatingSyncButton from '../components/home-screen/CustomBottonFloatingSyncButton';
 import HomeHeaderLeftView from '../components/home-screen/HomeHeaderLeftView';
 import HomeHeaderRightView from '../components/home-screen/HomeHeaderRightView';
-import ImageModal from '../components/ImageModal';
 import RecentChat from '../components/home-screen/RecentChat';
+import ImageModal from '../components/ImageModal';
 import SearchBox from '../components/SearchBox';
 import {insertChats} from '../db/chatsSchema';
 import {
@@ -18,19 +21,17 @@ import {
 } from '../db/recent_chat_users';
 import {
   decryptTestMessage,
-  generateRsaKeys,
   initiateRSAKeysInitialization,
   reInitializeKeysSaveAndSyncIt,
-  saveGeneratedRSAKeys,
 } from '../security/RSAEncryptionService';
-import {EnumMessageType} from '../utils/EnumMessageType';
-
-import 'react-native-get-random-values';
-import {v4 as uuid} from 'uuid';
+import NotifService from '../services/NotificationService';
 import {allAppColors} from '../utils/colors';
+import {EnumMessageType} from '../utils/EnumMessageType';
 
 export default function HomeScreen({navigation}) {
   const {currentUserInfo, signOut} = React.useContext(AuthContext);
+
+  const appState = useRef(AppState.currentState);
 
   const [recentChatUsers, setRecentChatUsers] = useState([]);
 
@@ -166,13 +167,16 @@ export default function HomeScreen({navigation}) {
       // console.log(chatMessage.textMessage);
       insertChats(chatMessage)
         .then(() => {
-          if (messageReceived.type === EnumMessageType.TEXT)
+          if (messageReceived.type === EnumMessageType.TEXT) {
+            // showPopNotication(chatMessage.send_to_id, chatMessage.textMessage);
             updateLastMessageAndCount(
               chatMessage.send_to_id,
               chatMessage.textMessage,
               activeChatingWithFriendId.current,
+              showPopNotication,
             ) // .then(() => console.log('message: ', chatMessage.textMessage))
               .catch(e => console.log('e1', e));
+          }
         })
         .catch(e => console.log('e2', e));
     } catch (e) {
@@ -225,6 +229,30 @@ export default function HomeScreen({navigation}) {
     activeChatingWithFriendId.current = userId;
     // console.log(userId);
   };
+
+  // Handling notification
+  const showPopNotication = (title, message) => {
+    console.log(activeChatingWithFriendId.current);
+    console.log('Popping out right here');
+    notifyService.current.localNotif(title, message);
+
+    if (appState.current === 'active') {
+      setTimeout(() => {
+        notifyService.current.cancelAll();
+      }, 5000);
+    }
+  };
+
+  const notifyService = useRef(null);
+
+  React.useEffect(() => {
+    notifyService.current = new NotifService();
+    if (appState.current === 'active') {
+      setTimeout(() => {
+        notifyService.current.cancelAll();
+      }, 500);
+    }
+  }, []);
 
   return (
     <>

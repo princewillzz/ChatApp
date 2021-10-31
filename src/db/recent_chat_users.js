@@ -48,6 +48,7 @@ export const updateLastMessageAndCount = (
   username,
   message,
   activeChatingWithFriendId,
+  callback,
 ) =>
   new Promise((resolve, reject) => {
     Realm.open(RecentChatUserdatabaseOptions)
@@ -67,6 +68,10 @@ export const updateLastMessageAndCount = (
             if (activeChatingWithFriendId !== recentChatUser[0].user_id) {
               recentChatUser[0].unseen_msg_count += 1;
               // console.log(recentChatUser[0].unseen_msg_count);
+            }
+            // Move this thing inside the above condition so that it only shows for users whom you are not taking to currently
+            if (typeof callback === 'function') {
+              callback(recentChatUser[0].displayName, message);
             }
           }
 
